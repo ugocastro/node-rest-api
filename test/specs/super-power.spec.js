@@ -31,17 +31,11 @@ describe('Super powers', () => {
     });
 
     it('should return 200 with a subset of super powers', done => {
-      const superPowers = [];
       const limit = 1;
       Promise.resolve(new SuperPowerModel({ name: 'x-ray' }))
         .then(superPower => superPower.save())
-        .then(superPower => {
-          superPowers.push(superPower);
-          return Promise
-            .resolve(new SuperPowerModel({ name: 'adamantium claws' }))
-        })
+        .then(superPower => new SuperPowerModel({ name: 'adamantium claws' }))
         .then(superPower => superPower.save())
-        .then(superPower => superPowers.push(superPower))
         .then(() => {
           chai.request(server)
             .get('/super-powers')
@@ -63,8 +57,7 @@ describe('Super powers', () => {
         .then(superPower => superPower.save())
         .then(superPower => {
           superPowers.push(superPower);
-          return Promise
-            .resolve(new SuperPowerModel({ name: 'adamantium claws' }))
+          return new SuperPowerModel({ name: 'adamantium claws' });
         })
         .then(superPower => superPower.save())
         .then(superPower => superPowers.push(superPower))
