@@ -3,10 +3,15 @@
 const fs = require('fs');
 const express = require('express');
 const expressValidator = require('express-validator');
-const app = express();
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const config = require('./config');
+const authRoute = require('./api/routes/auth.route');
+const checkAuthentication = require('./api/middlewares/authentication.middleware');
+const checkContentType = require('./api/middlewares/content-type.middleware');
+const notFound = require('./api/middlewares/not-found.middleware');
+
+const app = express();
 
 mongoose.Promise = global.Promise;
 mongoose.connect(`mongodb://${config.host}/${config.database}`, err => {
@@ -20,14 +25,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(expressValidator());
+app.use(checkContentType);
 
-app.use((req, res, next) => {
-  if (req.headers['content-type'] !== config.contentType) {
-    return res.status(400)
-      .json({ error: `Invalid content-type. Use '${config.contentType}'` });
-  }
-  return next();
-})
+authRoute(app);
+
+app.use(checkAuthentication);
 
 app.use((req, res, next) => {
   req.checkQuery('page', "Must be an integer with '1' as min value")
@@ -45,14 +47,14 @@ app.use((req, res, next) => {
 });
 
 const routesPath = './api/routes/';
-fs.readdirSync(routesPath).forEach(fileName => {
-  const route = require(routesPath + fileName);
-  route(app);
-})
-
-app.use((req, res) => {
-  return res.status(404).json({ error: `${req.method} '${req.originalUrl}' not found` });
+fs.readdirSync(routesPath).forEach(filename => {
+  if (filename !== 'auth.route.js') {
+    const route = require(routesPath + filename);
+    route(app);
+  }
 });
+
+app.use(notFound);
 
 app.listen(config.port, err => {
   if (err) {

@@ -2,9 +2,10 @@
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const server = require('../server');
-const config = require ('../config');
-const SuperPowerModel = require('../api/models/super-power.model');
+const server = require('../../server');
+const config = require ('../../config');
+const SuperPowerModel = require('../../api/models/super-power.model');
+const authStub = require('../stubs/auth.stub');
 const should = chai.should();
 
 chai.use(chaiHttp);
@@ -19,6 +20,7 @@ describe('Super powers', () => {
     it('should return 200 with an empty set of super powers', done => {
       chai.request(server)
         .get('/super-powers')
+        .set('x-access-token', authStub.mockValidToken())
         .set('content-type', 'application/json')
         .end((req, res) => {
           res.should.have.status(200);
@@ -43,6 +45,7 @@ describe('Super powers', () => {
         .then(() => {
           chai.request(server)
             .get('/super-powers')
+            .set('x-access-token', authStub.mockValidToken())
             .query({ limit })
             .set('content-type', 'application/json')
             .end((req, res) => {
@@ -68,6 +71,7 @@ describe('Super powers', () => {
         .then(() => {
           chai.request(server)
             .get('/super-powers')
+            .set('x-access-token', authStub.mockValidToken())
             .set('content-type', 'application/json')
             .end((req, res) => {
               res.should.have.status(200);
@@ -81,6 +85,7 @@ describe('Super powers', () => {
     it('should return 400 with invalid content-type', done => {
       chai.request(server)
         .get('/super-powers')
+        .set('x-access-token', authStub.mockValidToken())
         .set('content-type', 'text/plain')
         .end((req, res) => {
           res.should.have.status(400);
@@ -95,6 +100,7 @@ describe('Super powers', () => {
     it('should return 400 with invalid page query param', done => {
       chai.request(server)
         .get('/super-powers')
+        .set('x-access-token', authStub.mockValidToken())
         .query({ page: 'abc' })
         .set('content-type', 'application/json')
         .end((req, res) => {
@@ -113,6 +119,7 @@ describe('Super powers', () => {
     it('should return 400 with invalid limit query param', done => {
       chai.request(server)
         .get('/super-powers')
+        .set('x-access-token', authStub.mockValidToken())
         .query({ limit: -2 })
         .set('content-type', 'application/json')
         .end((req, res) => {
@@ -128,9 +135,39 @@ describe('Super powers', () => {
         });
     });
 
+    it('should return 401 without access token', done => {
+      chai.request(server)
+        .get('/super-powers')
+        .set('content-type', 'application/json')
+        .end((req, res) => {
+          res.should.have.status(401);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.be
+            .eql('User is not authenticated');
+          done();
+        });
+    });
+
+    it('should return 401 with invalid access token', done => {
+      chai.request(server)
+        .get('/super-powers')
+        .set('x-access-token', authStub.mockInvalidToken())
+        .set('content-type', 'application/json')
+        .end((req, res) => {
+          res.should.have.status(401);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.be
+            .eql('Invalid access token');
+          done();
+        });
+    });
+
     it('should return 404 with invalid method', done => {
       chai.request(server)
         .patch('/super-powers')
+        .set('x-access-token', authStub.mockValidToken())
         .set('content-type', 'application/json')
         .end((req, res) => {
           res.should.have.status(404);

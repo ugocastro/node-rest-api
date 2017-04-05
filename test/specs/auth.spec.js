@@ -3,9 +3,9 @@
 const bcrypt = require('bcrypt');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const server = require('../server');
-const config = require ('../config');
-const UserModel = require('../api/models/user.model');
+const server = require('../../server');
+const config = require ('../../config');
+const UserModel = require('../../api/models/user.model');
 const should = chai.should();
 
 chai.use(chaiHttp);
@@ -41,20 +41,6 @@ describe('Authentication', () => {
         });
     });
 
-    it('should return 404 with invalid user', done => {
-      chai.request(server)
-        .post('/authenticate')
-        .set('content-type', 'application/json')
-        .send({ username: 'john.doe' })
-        .end((req, res) => {
-          res.should.have.status(404);
-          res.body.should.be.a('object');
-          res.body.should.have.property('error');
-          res.body.error.should.be.eql('User not found');
-          done();
-        });
-    });
-
     it('should return 401 with invalid password', done => {
       chai.request(server)
         .post('/authenticate')
@@ -65,6 +51,20 @@ describe('Authentication', () => {
           res.body.should.be.a('object');
           res.body.should.have.property('error');
           res.body.error.should.be.eql('Invalid username/password');
+          done();
+        });
+    });
+
+    it('should return 404 with invalid user', done => {
+      chai.request(server)
+        .post('/authenticate')
+        .set('content-type', 'application/json')
+        .send({ username: 'john.doe' })
+        .end((req, res) => {
+          res.should.have.status(404);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.be.eql('User not found');
           done();
         });
     });
