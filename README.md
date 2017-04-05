@@ -4,21 +4,21 @@ This project consists of a **REST API** using _NodeJS_ to provide information ab
 
 ## Summary
 * [Requirements](#requirements)
-* [Install](#install)
+* [Installation](#installation)
 * [How to use](#how-to-use)
-  * [Execute](#execute)
+  * [Build and run](#build-and-run)
   * [Test](#test)
   * [Coverage](#coverage)
 * [License](#license)
 
 ## Requirements
-That's required to install the following dependencies:
+It's required to install the following dependencies:
  * NodeJS v6.10.1;
  * npm v4.5.0;
  * MongoDB v3.4.3;
 
-## Install
-Follow the steps bellow to clone and install project dependencies:
+## Installation
+Follow the steps below to clone and install project dependencies:
 ```
 $ git clone git@github.com:ugocastro/node-rest-api.git
 $ cd node-rest-api/
@@ -27,9 +27,9 @@ $ npm install
 
 ## How to use
 Verify if _MongoDB_ is running before starting the application.
-<p>Execute the following commands on project's folder.
+<p>Execute the following commands on project's root folder.
 
-### Execute
+### Build and run
 Execute the following command:
 ```
 $ npm start
@@ -45,12 +45,12 @@ $ npm test
 ```
 
 ### Coverage
-In order to execute code coverage, please execute:
+In order to execute code coverage, please run:
 ```
 $ npm run coverage
 ```
 
-> **Notes:** This tasks executes `nyc` to obtain code coverage.
+> **Notes:** This task executes `nyc` to obtain code coverage.
 > Coverage is shown on command line and also an HTML file is generated at `${PROJECT_ROOT_DIR}/coverage/index.html`.
 
 ## License
