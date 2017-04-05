@@ -4,22 +4,22 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const server = require('../../server');
 const config = require ('../../config');
-const SuperPowerModel = require('../../api/models/super-power.model');
+const ProtectionAreaModel = require('../../api/models/protection-area.model');
 const authStub = require('../stubs/auth.stub');
 const should = chai.should();
 
 chai.use(chaiHttp);
 
-describe('Super powers', () => {
+describe('Protection areas', () => {
   beforeEach(done => {
-    SuperPowerModel.remove({})
+    ProtectionAreaModel.remove({})
       .then(() => done());
   });
 
-  describe('GET /super-powers', () => {
-    it('should return 200 with an empty set of super powers', done => {
+  describe('GET /protection-areas', () => {
+    it('should return 200 with an empty set of protection areas', done => {
       chai.request(server)
-        .get('/super-powers')
+        .get('/protection-areas')
         .set('x-access-token', authStub.mockValidToken())
         .set('content-type', 'application/json')
         .end((req, res) => {
@@ -30,21 +30,23 @@ describe('Super powers', () => {
         });
     });
 
-    it('should return 200 with a subset of super powers', done => {
-      const superPowers = [];
+    it('should return 200 with a subset of protection areas', done => {
+      const areas = [];
       const limit = 1;
-      Promise.resolve(new SuperPowerModel({ name: 'x-ray' }))
-        .then(superPower => superPower.save())
-        .then(superPower => {
-          superPowers.push(superPower);
+      Promise.resolve(new ProtectionAreaModel({ name: 'Gotham',
+        latitude: 23.123, longitude: 12.817, radius: 5 }))
+        .then(area => area.save())
+        .then(area => {
+          areas.push(area);
           return Promise
-            .resolve(new SuperPowerModel({ name: 'adamantium claws' }))
+            .resolve(new ProtectionAreaModel({ name: 'New York',
+              latitude: 22.154, longitude: 36.357, radius: 10 }))
         })
-        .then(superPower => superPower.save())
-        .then(superPower => superPowers.push(superPower))
+        .then(area => area.save())
+        .then(area => areas.push(area))
         .then(() => {
           chai.request(server)
-            .get('/super-powers')
+            .get('/protection-areas')
             .set('x-access-token', authStub.mockValidToken())
             .query({ limit })
             .set('content-type', 'application/json')
@@ -57,26 +59,28 @@ describe('Super powers', () => {
         });
     });
 
-    it('should return 200 with all super powers', done => {
-      const superPowers = [];
-      Promise.resolve(new SuperPowerModel({ name: 'x-ray' }))
-        .then(superPower => superPower.save())
-        .then(superPower => {
-          superPowers.push(superPower);
+    it('should return 200 with all protection areas', done => {
+      const areas = [];
+      Promise.resolve(new ProtectionAreaModel({ name: 'Gotham',
+        latitude: 23.123, longitude: 12.817, radius: 5 }))
+        .then(area => area.save())
+        .then(area => {
+          areas.push(area);
           return Promise
-            .resolve(new SuperPowerModel({ name: 'adamantium claws' }))
+            .resolve(new ProtectionAreaModel({ name: 'New York',
+              latitude: 22.154, longitude: 36.357, radius: 10 }))
         })
-        .then(superPower => superPower.save())
-        .then(superPower => superPowers.push(superPower))
+        .then(area => area.save())
+        .then(area => areas.push(area))
         .then(() => {
           chai.request(server)
-            .get('/super-powers')
+            .get('/protection-areas')
             .set('x-access-token', authStub.mockValidToken())
             .set('content-type', 'application/json')
             .end((req, res) => {
               res.should.have.status(200);
               res.body.should.be.a('array');
-              res.body.length.should.be.eql(superPowers.length);
+              res.body.length.should.be.eql(areas.length);
               done();
             });
         });

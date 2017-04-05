@@ -25,6 +25,44 @@ describe('Common scenarios', () => {
       });
   });
 
+  it('should return 400 with invalid page query param', done => {
+    chai.request(server)
+      .get('/protection-areas')
+      .set('x-access-token', authStub.mockValidToken())
+      .query({ page: 'abc' })
+      .set('content-type', 'application/json')
+      .end((req, res) => {
+        res.should.have.status(400);
+        res.body.should.be.a('object');
+        res.body.should.have.property('errors');
+        res.body.errors.should.be.a('array');
+        res.body.errors.should.have.length(1);
+        res.body.errors[0].should.have.property('msg');
+        res.body.errors[0].msg.should.be
+          .eql("Must be an integer with '1' as min value");
+        done();
+      });
+  });
+
+  it('should return 400 with invalid limit query param', done => {
+    chai.request(server)
+      .get('/protection-areas')
+      .set('x-access-token', authStub.mockValidToken())
+      .query({ limit: -2 })
+      .set('content-type', 'application/json')
+      .end((req, res) => {
+        res.should.have.status(400);
+        res.body.should.be.a('object');
+        res.body.should.have.property('errors');
+        res.body.errors.should.be.a('array');
+        res.body.errors.should.have.length(1);
+        res.body.errors[0].should.have.property('msg');
+        res.body.errors[0].msg.should.be
+          .eql("Must be an integer with '1' as min value");
+        done();
+      });
+  });
+
   it('should return 401 without access token', done => {
     chai.request(server)
       .get('/super-powers')
