@@ -9,6 +9,7 @@ This project consists of a **REST API** using _NodeJS_ to provide information ab
   * [Build and run](#build-and-run)
   * [Test](#test)
   * [Coverage](#coverage)
+  * [Reset development database](#reset-development-database)
 * [License](#license)
 
 ## Requirements
@@ -52,6 +53,12 @@ $ npm run coverage
 
 > **Notes:** This task executes `nyc` to obtain code coverage.
 > Coverage is shown on command line and also an HTML file is generated at `${PROJECT_ROOT_DIR}/coverage/index.html`.
+
+### Reset development database
+The following command can be used to drop _development_ database and insert initial data, for example, roles and an administrator user.
+```
+$ npm run reset-dev-db
+```
 
 ## License
 MIT.

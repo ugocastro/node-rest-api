@@ -6,6 +6,7 @@ exports.list = (req, res) => {
   const page = req.query.page || 1;
   const limit = req.query.limit || 10;
   const skip = (page - 1) * limit;
+
   SuperPowerModel.find({})
     .skip(skip)
     .limit(parseInt(limit, 10))
