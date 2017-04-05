@@ -6,7 +6,7 @@
   "scripts": {
     "start": "set NODE_ENV=development && nodemon server.js",
     "test": "set NODE_ENV=test && mocha",
-    "coverage": "set NODE_ENV=test && nyc --reporter=html --reporter=text mocha"
+    "coverage": "set NODE_ENV=test && nyc --check-coverage --lines 60 --reporter=html --reporter=text mocha"
   },
   "repository": {
     "type": "git",
