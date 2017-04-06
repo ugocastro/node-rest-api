@@ -1,6 +1,7 @@
 'use strict';
 
 const ObjectId = require('mongoose').Types.ObjectId;
+const config = require('../../config');
 const SuperPowerModel = require('../models/super-power.model');
 
 exports.findOne = (req, res) => {
@@ -31,4 +32,26 @@ exports.list = (req, res) => {
     .exec()
     .then(superPowers => res.json(superPowers))
     .catch((err) => res.status(500).json(err));
+};
+
+exports.create = (req, res) => {
+  const body = req.body;
+  if (!body.name) {
+    return res.status(400).json({ error: 'Name is required' });
+  }
+
+  Promise.resolve()
+    .then(() => new SuperPowerModel(body))
+    .then(superPower => superPower.save())
+    .then(superPower => {
+      res.setHeader('Location',
+        `${config.protocol}://${config.host}:${config.port}/super-powers/${superPower._id}`);
+      return res.sendStatus(201);
+    })
+    .catch(err => {
+      if (err.message && err.message.includes('duplicate key error')) {
+        return res.status(422).json({ error: 'Duplicated super power' });
+      }
+      return res.status(500).json(err);
+    });
 };

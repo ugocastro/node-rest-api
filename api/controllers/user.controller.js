@@ -42,7 +42,7 @@ exports.create = (req, res) => {
     })
     .then(user => {
       res.setHeader('Location',
-        `${config.protocol}://${config.host}:${config.port}/${user._id}`);
+        `${config.protocol}://${config.host}:${config.port}/users/${user._id}`);
       return res.sendStatus(201);
     })
     .catch(err => {

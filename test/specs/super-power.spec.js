@@ -131,4 +131,53 @@ describe('Super powers', () => {
         });
     });
   });
+
+  describe('POST /super-powers', () => {
+    it('should return 201 with a valid super power', done => {
+      chai.request(server)
+        .post('/super-powers')
+        .send({ name: 'x-ray' })
+        .set('x-access-token', authStub.mockValidToken())
+        .set('content-type', 'application/json')
+        .end((req, res) => {
+          res.should.have.status(201);
+          res.headers.should.have.property('location');
+          done();
+        });
+    });
+
+    it('should return 400 without name', done => {
+      chai.request(server)
+        .post('/super-powers')
+        .send({ description: 'Very strong magical power' })
+        .set('x-access-token', authStub.mockValidToken())
+        .set('content-type', 'application/json')
+        .end((req, res) => {
+          res.should.have.status(400);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.be.eql('Name is required');
+          done();
+        });
+    });
+
+    it('should return 422 with a duplicated name', done => {
+      Promise.resolve(new SuperPowerModel({ name: 'adamantium claws' }))
+        .then(superPower => superPower.save())
+        .then(() => {
+          chai.request(server)
+            .post('/super-powers')
+            .send({ name: 'adamantium claws' })
+            .set('x-access-token', authStub.mockValidToken())
+            .set('content-type', 'application/json')
+            .end((req, res) => {
+              res.should.have.status(422);
+              res.body.should.be.a('object');
+              res.body.should.have.property('error');
+              res.body.error.should.be.eql('Duplicated super power');
+              done();
+            });
+      });
+    });
+  });
 })
