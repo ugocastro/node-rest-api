@@ -19,7 +19,7 @@ exports.findOne = (req, res) => {
       }
       return res.status(404).json({ error: 'Super hero not found' });
     })
-    .catch((err) => res.status(500).json(err));
+    .catch(() => res.status(500).json({ error: 'An unexpected error occurred' }));
 };
 
 exports.list = (req, res) => {
@@ -33,7 +33,7 @@ exports.list = (req, res) => {
     .populate('protectionArea')
     .exec()
     .then(superHeroes => res.json(superHeroes))
-    .catch((err) => res.status(500).json(err));
+    .catch(() => res.status(500).json({ error: 'An unexpected error occurred' }));
 };
 
 exports.create = (req, res) => {
@@ -72,6 +72,6 @@ exports.create = (req, res) => {
               .json({ error: '(Protection area/super power) does not exist' });
           }
       }
-      return res.status(500).json(err);
+      return res.status(500).json({ error: 'An unexpected error occurred' });
     });
 };

@@ -1,6 +1,7 @@
 'use strict';
 
 const bcrypt = require('bcrypt');
+const ObjectId = require('mongoose').Types.ObjectId;
 const config = require('../../config');
 const UserModel = require('../models/user.model');
 
@@ -19,7 +20,7 @@ exports.list = (req, res) => {
       $user.password = undefined;
       return $user;
     })))
-    .catch((err) => res.status(500).json(err));
+    .catch(() => res.status(500).json({ error: 'An unexpected error occurred' }));
 };
 
 exports.create = (req, res) => {
@@ -57,6 +58,23 @@ exports.create = (req, res) => {
           return res.status(400).json({ error: 'Role does not exist' });
         }
       }
-      return res.status(500).json(err);
+      return res.status(500).json({ error: 'An unexpected error occurred' });
     });
+};
+
+exports.delete = (req, res) => {
+  const id = req.params.id;
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).json({ error: 'User not found' });
+  }
+
+  UserModel.findOne({ _id: id })
+    .then(user => {
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      return user.remove()
+        .then(() => res.sendStatus(204));
+  })
+  .catch(() => res.status(500).json({ error: 'An unexpected error occurred' }));
 };

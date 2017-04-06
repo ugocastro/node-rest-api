@@ -19,5 +19,5 @@ exports.authenticate = (req, res) => {
           return res.status(401).json({ error: 'Invalid username/password' });
         });
     })
-    .catch(err => res.status(500).json(err));
+    .catch(() => res.status(500).json({ error: 'An unexpected error occurred' }));
 };

@@ -11,14 +11,13 @@ exports.findOne = (req, res) => {
   }
 
   SuperPowerModel.findOne({ _id: id })
-    .exec()
     .then(superPower => {
       if (superPower) {
         return res.json(superPower);
       }
       return res.status(404).json({ error: 'Super power not found' });
     })
-    .catch((err) => res.status(500).json(err));
+    .catch(() => res.status(500).json({ error: 'An unexpected error occurred' }));
 };
 
 exports.list = (req, res) => {
@@ -31,7 +30,7 @@ exports.list = (req, res) => {
     .limit(parseInt(limit, 10))
     .exec()
     .then(superPowers => res.json(superPowers))
-    .catch((err) => res.status(500).json(err));
+    .catch(() => res.status(500).json({ error: 'An unexpected error occurred' }));
 };
 
 exports.create = (req, res) => {
@@ -52,6 +51,6 @@ exports.create = (req, res) => {
       if (err.message && err.message.includes('duplicate key error')) {
         return res.status(422).json({ error: 'Duplicated super power' });
       }
-      return res.status(500).json(err);
+      return res.status(500).json({ error: 'An unexpected error occurred' });
     });
 };

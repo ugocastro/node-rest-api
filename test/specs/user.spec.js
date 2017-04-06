@@ -187,4 +187,50 @@ describe('Users', () => {
         });
     });
   });
+
+  describe('DELETE /users/:id', () => {
+    it('should return 204 with valid id', done => {
+      Promise.resolve(new UserModel({ username: 'Administrator',
+        password: '123' }))
+        .then(user => user.save())
+        .then(user => {
+          chai.request(server)
+            .delete(`/users/${user._id}`)
+            .set('x-access-token', authStub.mockValidToken())
+            .set('content-type', 'application/json')
+            .end((req, res) => {
+              res.should.have.status(204);
+              done();
+            });
+        });
+    });
+
+    it('should return 404 with invalid id', done => {
+      chai.request(server)
+        .delete('/users/invalid-id')
+        .set('x-access-token', authStub.mockValidToken())
+        .set('content-type', 'application/json')
+        .end((req, res) => {
+          res.should.have.status(404);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.be.eql('User not found');
+          done();
+        });
+    });
+
+    it('should return 404 with id that does not exist', done => {
+      chai.request(server)
+        .delete('/users/58e5131e634a8d13f059930d')
+        .set('x-access-token', authStub.mockValidToken())
+        .set('content-type', 'application/json')
+        .end((req, res) => {
+          res.should.have.status(404);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.be.eql('User not found');
+          done();
+        });
+    });
+  });
 })
