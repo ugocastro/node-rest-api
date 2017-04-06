@@ -12,9 +12,18 @@ const should = chai.should();
 chai.use(chaiHttp);
 
 describe('Users', () => {
-  beforeEach(done => {
+  before(done => {
     RoleModel.remove({})
-      .then(() => UserModel.remove({}))
+      .then(() => new RoleModel({ _id: '58e5131e634a8d13f059930a', name: 'Admin' }))
+      .then(role => role.save())
+      .then(role => {
+        this.role = role;
+        return done();
+      });
+  });
+
+  beforeEach(done => {
+    UserModel.remove({})
       .then(() => done());
   });
 
@@ -22,7 +31,7 @@ describe('Users', () => {
     it('should return 200 with an empty set of users', done => {
       chai.request(server)
         .get('/users')
-        .set('x-access-token', authStub.mockValidToken())
+        .set('x-access-token', authStub.mockAdminToken())
         .set('content-type', 'application/json')
         .end((req, res) => {
           res.should.have.status(200);
@@ -34,13 +43,8 @@ describe('Users', () => {
 
     it('should return 200 with a subset of users', done => {
       const limit = 1;
-      Promise.resolve(new RoleModel({ name: 'Admin' }))
-        .then(role => role.save())
-        .then(role => {
-          this.role = role;
-          return new UserModel({ username: 'Administrator', password: '123',
-            roles: [this.role._id]});
-        })
+      Promise.resolve(new UserModel({ username: 'Administrator', password: '123',
+          roles: [this.role._id]}))
         .then(user => user.save())
         .then(() => new UserModel({ username: 'Admin', password: 'abc',
           roles: [this.role._id]}))
@@ -48,7 +52,7 @@ describe('Users', () => {
         .then(() => {
           chai.request(server)
             .get('/users')
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .query({ limit })
             .set('content-type', 'application/json')
             .end((req, res) => {
@@ -62,13 +66,8 @@ describe('Users', () => {
 
     it('should return 200 with all users', done => {
       const users = [];
-      Promise.resolve(new RoleModel({ name: 'Admin' }))
-        .then(role => role.save())
-        .then(role => {
-          this.role = role;
-          return new UserModel({ username: 'Administrator', password: '123',
-            roles: [this.role._id]});
-        })
+      Promise.resolve(new UserModel({ username: 'Administrator', password: '123',
+          roles: [this.role._id]}))
         .then(user => user.save())
         .then(user => {
           users.push(user);
@@ -80,7 +79,7 @@ describe('Users', () => {
         .then(() => {
           chai.request(server)
             .get('/users')
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .set('content-type', 'application/json')
             .end((req, res) => {
               res.should.have.status(200);
@@ -97,7 +96,7 @@ describe('Users', () => {
       chai.request(server)
         .post('/users')
         .send({ username: 'Administrator', password: '123' })
-        .set('x-access-token', authStub.mockValidToken())
+        .set('x-access-token', authStub.mockAdminToken())
         .set('content-type', 'application/json')
         .end((req, res) => {
           res.should.have.status(201);
@@ -110,7 +109,7 @@ describe('Users', () => {
       chai.request(server)
         .post('/users')
         .send({ password: '123' })
-        .set('x-access-token', authStub.mockValidToken())
+        .set('x-access-token', authStub.mockAdminToken())
         .set('content-type', 'application/json')
         .end((req, res) => {
           res.should.have.status(400);
@@ -125,7 +124,7 @@ describe('Users', () => {
       chai.request(server)
         .post('/users')
         .send({ username: 'user' })
-        .set('x-access-token', authStub.mockValidToken())
+        .set('x-access-token', authStub.mockAdminToken())
         .set('content-type', 'application/json')
         .end((req, res) => {
           res.should.have.status(400);
@@ -140,7 +139,7 @@ describe('Users', () => {
       chai.request(server)
         .post('/users')
         .send({ username: 'user', password: '123', roles: ['123'] })
-        .set('x-access-token', authStub.mockValidToken())
+        .set('x-access-token', authStub.mockAdminToken())
         .set('content-type', 'application/json')
         .end((req, res) => {
           res.should.have.status(400);
@@ -151,12 +150,12 @@ describe('Users', () => {
         });
     });
 
-    it('should return 400 with invalid role', done => {
+    it('should return 400 with role that does not exist', done => {
       chai.request(server)
         .post('/users')
         .send({ username: 'user', password: '123',
-          roles: ['58e5131e634a8d13f059930a'] })
-        .set('x-access-token', authStub.mockValidToken())
+          roles: ['58e5131e634a8d13f059930f'] })
+        .set('x-access-token', authStub.mockAdminToken())
         .set('content-type', 'application/json')
         .end((req, res) => {
           res.should.have.status(400);
@@ -175,7 +174,7 @@ describe('Users', () => {
           chai.request(server)
             .post('/users')
             .send({ username: 'Administrator', password: 'abc' })
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .set('content-type', 'application/json')
             .end((req, res) => {
               res.should.have.status(422);
@@ -196,7 +195,7 @@ describe('Users', () => {
         .then(user => {
           chai.request(server)
             .delete(`/users/${user._id}`)
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .set('content-type', 'application/json')
             .end((req, res) => {
               res.should.have.status(204);
@@ -208,7 +207,7 @@ describe('Users', () => {
     it('should return 404 with invalid id', done => {
       chai.request(server)
         .delete('/users/invalid-id')
-        .set('x-access-token', authStub.mockValidToken())
+        .set('x-access-token', authStub.mockAdminToken())
         .set('content-type', 'application/json')
         .end((req, res) => {
           res.should.have.status(404);
@@ -222,7 +221,7 @@ describe('Users', () => {
     it('should return 404 with id that does not exist', done => {
       chai.request(server)
         .delete('/users/58e5131e634a8d13f059930d')
-        .set('x-access-token', authStub.mockValidToken())
+        .set('x-access-token', authStub.mockAdminToken())
         .set('content-type', 'application/json')
         .end((req, res) => {
           res.should.have.status(404);

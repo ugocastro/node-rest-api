@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const config = require('./config');
 const authRoute = require('./api/routes/auth.route');
-const checkAuthentication = require('./api/middlewares/authentication.middleware');
+const checkAuth = require('./api/middlewares/auth.middleware');
 const checkContentType = require('./api/middlewares/content-type.middleware');
 const checkQueryParams = require('./api/middlewares/query-param.middleware');
 const notFound = require('./api/middlewares/not-found.middleware');
@@ -29,7 +29,7 @@ app.use(checkContentType);
 
 authRoute(app);
 
-app.use(checkAuthentication);
+app.use(checkAuth);
 app.use(checkQueryParams);
 
 const routesPath = './api/routes/';

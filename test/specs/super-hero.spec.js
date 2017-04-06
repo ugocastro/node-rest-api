@@ -7,12 +7,20 @@ const config = require ('../../config');
 const ProtectionAreaModel = require('../../api/models/protection-area.model');
 const SuperHeroModel = require('../../api/models/super-hero.model');
 const SuperPowerModel = require('../../api/models/super-power.model')
+const RoleModel = require('../../api/models/role.model')
 const authStub = require('../stubs/auth.stub');
 const should = chai.should();
 
 chai.use(chaiHttp);
 
 describe('Super heroes', () => {
+  before(done => {
+    RoleModel.remove({})
+      .then(() => new RoleModel({ _id: '58e5131e634a8d13f059930a', name: 'Admin' }))
+      .then(role => role.save())
+      .then(() => done());
+  });
+
   beforeEach(done => {
     ProtectionAreaModel.remove({})
       .then(() => SuperPowerModel.remove({}))
@@ -24,7 +32,7 @@ describe('Super heroes', () => {
     it('should return 200 with an empty set of super heroes', done => {
       chai.request(server)
         .get('/super-heroes')
-        .set('x-access-token', authStub.mockValidToken())
+        .set('x-access-token', authStub.mockAdminToken())
         .set('content-type', 'application/json')
         .end((req, res) => {
           res.should.have.status(200);
@@ -56,7 +64,7 @@ describe('Super heroes', () => {
         .then(() => {
           chai.request(server)
             .get('/super-heroes')
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .query({ limit })
             .set('content-type', 'application/json')
             .end((req, res) => {
@@ -94,7 +102,7 @@ describe('Super heroes', () => {
         .then(() => {
           chai.request(server)
             .get('/super-heroes')
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .set('content-type', 'application/json')
             .end((req, res) => {
               res.should.have.status(200);
@@ -125,7 +133,7 @@ describe('Super heroes', () => {
         .then(superHero => {
           chai.request(server)
             .get(`/super-heroes/${superHero._id}`)
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .set('content-type', 'application/json')
             .end((req, res) => {
               res.should.have.status(200);
@@ -155,7 +163,7 @@ describe('Super heroes', () => {
         .then(superHero => {
           chai.request(server)
             .get(`/super-heroes/invalid-id`)
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .set('content-type', 'application/json')
             .end((req, res) => {
               res.should.have.status(404);
@@ -185,7 +193,7 @@ describe('Super heroes', () => {
         .then(superHero => {
           chai.request(server)
             .get(`/super-heroes/${superHero._id.toString().replace(/.$/,"z")}`)
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .set('content-type', 'application/json')
             .end((req, res) => {
               res.should.have.status(404);
@@ -207,7 +215,7 @@ describe('Super heroes', () => {
         .then(() => {
           chai.request(server)
             .post('/super-heroes')
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .send({ name: 'Batman', alias: 'Bruce Wayne',
               protectionArea: this.protectionArea._id })
             .set('content-type', 'application/json')
@@ -222,7 +230,7 @@ describe('Super heroes', () => {
     it('should return 400 without name', done => {
       chai.request(server)
         .post('/super-heroes')
-        .set('x-access-token', authStub.mockValidToken())
+        .set('x-access-token', authStub.mockAdminToken())
         .send({ alias: 'Bruce Wayne' })
         .set('content-type', 'application/json')
         .end((req, res) => {
@@ -237,7 +245,7 @@ describe('Super heroes', () => {
     it('should return 400 without alias', done => {
       chai.request(server)
         .post('/super-heroes')
-        .set('x-access-token', authStub.mockValidToken())
+        .set('x-access-token', authStub.mockAdminToken())
         .send({ name: 'Batman' })
         .set('content-type', 'application/json')
         .end((req, res) => {
@@ -252,7 +260,7 @@ describe('Super heroes', () => {
     it('should return 400 without protection area', done => {
       chai.request(server)
         .post('/super-heroes')
-        .set('x-access-token', authStub.mockValidToken())
+        .set('x-access-token', authStub.mockAdminToken())
         .send({ name: 'Superman', alias: 'Clark Kent' })
         .set('content-type', 'application/json')
         .end((req, res) => {
@@ -267,7 +275,7 @@ describe('Super heroes', () => {
     it('should return 400 with invalid protection area id', done => {
       chai.request(server)
         .post('/super-heroes')
-        .set('x-access-token', authStub.mockValidToken())
+        .set('x-access-token', authStub.mockAdminToken())
         .send({ name: 'Superman', alias: 'Clark Kent', protectionArea: 'invalid-id' })
         .set('content-type', 'application/json')
         .end((req, res) => {
@@ -287,7 +295,7 @@ describe('Super heroes', () => {
         .then(() => {
           chai.request(server)
             .post('/super-heroes')
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .send({ name: 'Superman', alias: 'Clark Kent',
               protectionArea: this.protectionArea._id, superPowers: ['invalid-id'] })
             .set('content-type', 'application/json')
@@ -304,7 +312,7 @@ describe('Super heroes', () => {
     it('should return 400 with protection area id that does not exist', done => {
       chai.request(server)
         .post('/super-heroes')
-        .set('x-access-token', authStub.mockValidToken())
+        .set('x-access-token', authStub.mockAdminToken())
         .send({ name: 'Superman', alias: 'Clark Kent',
           protectionArea: '58e5131e634a8d13f059930c' })
         .set('content-type', 'application/json')
@@ -328,7 +336,7 @@ describe('Super heroes', () => {
         .then(() => {
           chai.request(server)
             .post('/super-heroes')
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .send({ name: 'Batman', alias: 'Clark Kent',
               protectionArea: this.protectionArea._id })
             .set('content-type', 'application/json')
@@ -355,7 +363,7 @@ describe('Super heroes', () => {
         .then(superHero => {
           chai.request(server)
             .delete(`/super-heroes/${superHero._id}`)
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .set('content-type', 'application/json')
             .end((req, res) => {
               res.should.have.status(204);
@@ -367,7 +375,7 @@ describe('Super heroes', () => {
     it('should return 404 with an invalid id', done => {
       chai.request(server)
         .delete('/super-heroes/invalid-id')
-        .set('x-access-token', authStub.mockValidToken())
+        .set('x-access-token', authStub.mockAdminToken())
         .set('content-type', 'application/json')
         .end((req, res) => {
           res.should.have.status(404);
@@ -381,7 +389,7 @@ describe('Super heroes', () => {
     it('should return 404 with an id that does not exist', done => {
       chai.request(server)
         .delete('/super-heroes/58e5131e634a8d13f059930c')
-        .set('x-access-token', authStub.mockValidToken())
+        .set('x-access-token', authStub.mockAdminToken())
         .set('content-type', 'application/json')
         .end((req, res) => {
           res.should.have.status(404);

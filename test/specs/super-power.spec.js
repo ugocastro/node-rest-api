@@ -7,12 +7,20 @@ const config = require ('../../config');
 const SuperPowerModel = require('../../api/models/super-power.model');
 const SuperHeroModel = require('../../api/models/super-hero.model');
 const ProtectionAreaModel = require('../../api/models/protection-area.model');
+const RoleModel = require('../../api/models/role.model');
 const authStub = require('../stubs/auth.stub');
 const should = chai.should();
 
 chai.use(chaiHttp);
 
 describe('Super powers', () => {
+  before(done => {
+    RoleModel.remove({})
+      .then(() => new RoleModel({ _id: '58e5131e634a8d13f059930a', name: 'Admin' }))
+      .then(role => role.save())
+      .then(() => done());
+  });
+
   beforeEach(done => {
     SuperPowerModel.remove({})
       .then(() => done());
@@ -22,7 +30,7 @@ describe('Super powers', () => {
     it('should return 200 with an empty set of super powers', done => {
       chai.request(server)
         .get('/super-powers')
-        .set('x-access-token', authStub.mockValidToken())
+        .set('x-access-token', authStub.mockAdminToken())
         .set('content-type', 'application/json')
         .end((req, res) => {
           res.should.have.status(200);
@@ -41,7 +49,7 @@ describe('Super powers', () => {
         .then(() => {
           chai.request(server)
             .get('/super-powers')
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .query({ limit })
             .set('content-type', 'application/json')
             .end((req, res) => {
@@ -66,7 +74,7 @@ describe('Super powers', () => {
         .then(() => {
           chai.request(server)
             .get('/super-powers')
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .set('content-type', 'application/json')
             .end((req, res) => {
               res.should.have.status(200);
@@ -85,7 +93,7 @@ describe('Super powers', () => {
         .then(superPower => {
           chai.request(server)
             .get(`/super-powers/${superPower._id}`)
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .set('content-type', 'application/json')
             .end((req, res) => {
               res.should.have.status(200);
@@ -103,7 +111,7 @@ describe('Super powers', () => {
         .then(superPower => {
           chai.request(server)
             .get(`/super-powers/invalid-id`)
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .set('content-type', 'application/json')
             .end((req, res) => {
               res.should.have.status(404);
@@ -121,7 +129,7 @@ describe('Super powers', () => {
         .then(superPower => {
           chai.request(server)
             .get(`/super-powers/${superPower._id.toString().replace(/.$/,"z")}`)
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .set('content-type', 'application/json')
             .end((req, res) => {
               res.should.have.status(404);
@@ -139,7 +147,7 @@ describe('Super powers', () => {
       chai.request(server)
         .post('/super-powers')
         .send({ name: 'x-ray' })
-        .set('x-access-token', authStub.mockValidToken())
+        .set('x-access-token', authStub.mockAdminToken())
         .set('content-type', 'application/json')
         .end((req, res) => {
           res.should.have.status(201);
@@ -152,7 +160,7 @@ describe('Super powers', () => {
       chai.request(server)
         .post('/super-powers')
         .send({ description: 'Very strong magical power' })
-        .set('x-access-token', authStub.mockValidToken())
+        .set('x-access-token', authStub.mockAdminToken())
         .set('content-type', 'application/json')
         .end((req, res) => {
           res.should.have.status(400);
@@ -170,7 +178,7 @@ describe('Super powers', () => {
           chai.request(server)
             .post('/super-powers')
             .send({ name: 'adamantium claws' })
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .set('content-type', 'application/json')
             .end((req, res) => {
               res.should.have.status(422);
@@ -190,7 +198,7 @@ describe('Super powers', () => {
         .then(superPower => {
           chai.request(server)
             .delete(`/super-powers/${superPower._id}`)
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .set('content-type', 'application/json')
             .end((req, res) => {
               res.should.have.status(204);
@@ -202,7 +210,7 @@ describe('Super powers', () => {
     it('should return 404 with an invalid id', done => {
       chai.request(server)
         .delete('/super-powers/invalid-id')
-        .set('x-access-token', authStub.mockValidToken())
+        .set('x-access-token', authStub.mockAdminToken())
         .set('content-type', 'application/json')
         .end((req, res) => {
           res.should.have.status(404);
@@ -216,7 +224,7 @@ describe('Super powers', () => {
     it('should return 404 with an id that does not exist', done => {
       chai.request(server)
         .delete('/super-powers/58e5131e634a8d13f059930c')
-        .set('x-access-token', authStub.mockValidToken())
+        .set('x-access-token', authStub.mockAdminToken())
         .set('content-type', 'application/json')
         .end((req, res) => {
           res.should.have.status(404);
@@ -245,7 +253,7 @@ describe('Super powers', () => {
         .then(() => {
           chai.request(server)
             .delete(`/super-powers/${this.superPower._id}`)
-            .set('x-access-token', authStub.mockValidToken())
+            .set('x-access-token', authStub.mockAdminToken())
             .set('content-type', 'application/json')
             .end((req, res) => {
               res.should.have.status(422);
