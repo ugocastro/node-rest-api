@@ -9,6 +9,7 @@ const config = require('./config');
 const authRoute = require('./api/routes/auth.route');
 const checkAuthentication = require('./api/middlewares/authentication.middleware');
 const checkContentType = require('./api/middlewares/content-type.middleware');
+const checkQueryParams = require('./api/middlewares/query-param.middleware');
 const notFound = require('./api/middlewares/not-found.middleware');
 
 const app = express();
@@ -23,28 +24,13 @@ mongoose.connect(`mongodb://${config.host}/${config.database}`, err => {
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
 app.use(expressValidator());
 app.use(checkContentType);
 
 authRoute(app);
 
 app.use(checkAuthentication);
-
-app.use((req, res, next) => {
-  req.checkQuery('page', "Must be an integer with '1' as min value")
-    .optional().isInt({ min: 1 });
-  req.checkQuery('limit', "Must be an integer with '1' as min value")
-    .optional().isInt({ min: 1 });
-
-  req.getValidationResult()
-    .then(errors => {
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-      return next();
-    });
-});
+app.use(checkQueryParams);
 
 const routesPath = './api/routes/';
 fs.readdirSync(routesPath).forEach(filename => {
