@@ -75,4 +75,60 @@ describe('Super powers', () => {
         });
     });
   });
+
+  describe('GET /super-powers/:id', () => {
+    it('should return 200 with a valid id', done => {
+      Promise.resolve(new SuperPowerModel({ name: 'x-ray' }))
+        .then(superPower => superPower.save())
+        .then(superPower => {
+          chai.request(server)
+            .get(`/super-powers/${superPower._id}`)
+            .set('x-access-token', authStub.mockValidToken())
+            .set('content-type', 'application/json')
+            .end((req, res) => {
+              res.should.have.status(200);
+              res.body.should.be.a('object');
+              res.body.should.have.property('name');
+              res.body.name.should.be.eql(superPower.name);
+              done();
+            });
+        });
+    });
+
+    it('should return 404 with an invalid id', done => {
+      Promise.resolve(new SuperPowerModel({ name: 'x-ray' }))
+        .then(superPower => superPower.save())
+        .then(superPower => {
+          chai.request(server)
+            .get(`/super-powers/invalid-id`)
+            .set('x-access-token', authStub.mockValidToken())
+            .set('content-type', 'application/json')
+            .end((req, res) => {
+              res.should.have.status(404);
+              res.body.should.be.a('object');
+              res.body.should.have.property('error');
+              res.body.error.should.be.eql('Super power not found');
+              done();
+            });
+        });
+    });
+
+    it('should return 404 with an id that does not exist', done => {
+      Promise.resolve(new SuperPowerModel({ name: 'x-ray' }))
+        .then(superPower => superPower.save())
+        .then(superPower => {
+          chai.request(server)
+            .get(`/super-powers/${superPower._id.toString().replace(/.$/,"0")}`)
+            .set('x-access-token', authStub.mockValidToken())
+            .set('content-type', 'application/json')
+            .end((req, res) => {
+              res.should.have.status(404);
+              res.body.should.be.a('object');
+              res.body.should.have.property('error');
+              res.body.error.should.be.eql('Super power not found');
+              done();
+            });
+        });
+    });
+  });
 })
