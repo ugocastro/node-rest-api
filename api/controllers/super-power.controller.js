@@ -3,6 +3,7 @@
 const ObjectId = require('mongoose').Types.ObjectId;
 const config = require('../../config');
 const SuperPowerModel = require('../models/super-power.model');
+const SuperHeroModel = require('../models/super-hero.model');
 
 exports.findOne = (req, res) => {
   const id = req.params.id;
@@ -53,4 +54,28 @@ exports.create = (req, res) => {
       }
       return res.status(500).json({ error: 'An unexpected error occurred' });
     });
+};
+
+exports.delete = (req, res) => {
+  const id = req.params.id;
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).json({ error: 'Super power not found' });
+  }
+
+  SuperPowerModel.findOne({ _id: id })
+    .then(superPower => {
+      if (!superPower) {
+        return res.status(404).json({ error: 'Super power not found' });
+      }
+
+      return SuperHeroModel.find({ superPowers: id })
+        .then(superHeroes => {
+          if (superHeroes.length === 0) {
+            return superPower.remove()
+              .then(() => res.sendStatus(204));
+          }
+          return res.status(422).json({ error: 'Super power is associated to a super hero' });
+        })
+    })
+    .catch(() => res.status(500).json({ error: 'An unexpected error occurred' }));
 };

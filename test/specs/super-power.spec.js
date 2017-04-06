@@ -5,6 +5,8 @@ const chaiHttp = require('chai-http');
 const server = require('../../server');
 const config = require ('../../config');
 const SuperPowerModel = require('../../api/models/super-power.model');
+const SuperHeroModel = require('../../api/models/super-hero.model');
+const ProtectionAreaModel = require('../../api/models/protection-area.model');
 const authStub = require('../stubs/auth.stub');
 const should = chai.should();
 
@@ -178,6 +180,81 @@ describe('Super powers', () => {
               done();
             });
       });
+    });
+  });
+
+  describe('DELETE /super-powers/:id', () => {
+    it('should return 204 with a valid id', done => {
+      Promise.resolve(new SuperPowerModel({ name: 'explosive cards' }))
+        .then(superPower => superPower.save())
+        .then(superPower => {
+          chai.request(server)
+            .delete(`/super-powers/${superPower._id}`)
+            .set('x-access-token', authStub.mockValidToken())
+            .set('content-type', 'application/json')
+            .end((req, res) => {
+              res.should.have.status(204);
+              done();
+            });
+      });
+    });
+
+    it('should return 404 with an invalid id', done => {
+      chai.request(server)
+        .delete('/super-powers/invalid-id')
+        .set('x-access-token', authStub.mockValidToken())
+        .set('content-type', 'application/json')
+        .end((req, res) => {
+          res.should.have.status(404);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.be.eql('Super power not found');
+          done();
+        });
+    });
+
+    it('should return 404 with an id that does not exist', done => {
+      chai.request(server)
+        .delete('/super-powers/58e5131e634a8d13f059930c')
+        .set('x-access-token', authStub.mockValidToken())
+        .set('content-type', 'application/json')
+        .end((req, res) => {
+          res.should.have.status(404);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.be.eql('Super power not found');
+          done();
+        });
+    });
+
+    it('should return 422 with a super power associated with a super hero', done => {
+      Promise.resolve(new ProtectionAreaModel({ name: 'Gotham',
+        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        .then(area => area.save())
+        .then(area => {
+          this.protectionArea = area;
+          return new SuperPowerModel({ name: "Utilities' belt" });
+        })
+        .then(superPower => superPower.save())
+        .then(superPower => {
+          this.superPower = superPower;
+          return new SuperHeroModel({ name: 'Batman', alias: 'Bruce Wayne',
+            protectionArea: this.protectionArea._id, superPowers: [this.superPower._id] });
+        })
+        .then(superHero => superHero.save())
+        .then(() => {
+          chai.request(server)
+            .delete(`/super-powers/${this.superPower._id}`)
+            .set('x-access-token', authStub.mockValidToken())
+            .set('content-type', 'application/json')
+            .end((req, res) => {
+              res.should.have.status(422);
+              res.body.should.be.a('object');
+              res.body.should.have.property('error');
+              res.body.error.should.be.eql('Super power is associated to a super hero');
+              done();
+            });
+        });
     });
   });
 })
