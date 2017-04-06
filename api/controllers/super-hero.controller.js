@@ -3,6 +3,7 @@
 const ObjectId = require('mongoose').Types.ObjectId;
 const config = require('../../config');
 const SuperHeroModel = require('../models/super-hero.model');
+const AuditEventModel = require('../models/audit-event.model');
 
 exports.findOne = (req, res) => {
   const id = req.params.id;
@@ -54,8 +55,11 @@ exports.create = (req, res) => {
     .then(superHero => {
       res.setHeader('Location',
         `${config.protocol}://${config.host}:${config.port}/super-heroes/${superHero._id}`);
-      return res.sendStatus(201);
+      return new AuditEventModel({ entity: 'SuperHero', entityId: superHero._id.toString(),
+        datetime: new Date(), username: req.username, action: 'CREATE' })
     })
+    .then(auditEvent => auditEvent.save())
+    .then(() => res.sendStatus(201))
     .catch(err => {
       if (err.message && err.message.includes('duplicate key error')) {
         return res.status(422).json({ error: 'Duplicated super hero' });
@@ -88,6 +92,9 @@ exports.delete = (req, res) => {
         return res.status(404).json({ error: 'Super hero not found' });
       }
       return superHero.remove()
+        .then(() => new AuditEventModel({ entity: 'SuperHero', entityId: id,
+          datetime: new Date(), username: req.username, action: 'DELETE' }))
+        .then(auditEvent => auditEvent.save())
         .then(() => res.sendStatus(204));
   })
   .catch(() => res.status(500).json({ error: 'An unexpected error occurred' }));

@@ -12,7 +12,7 @@ module.exports = (req, res, next) => {
       if (err) {
         return res.status(401).json({ error: 'Invalid access token' });
       }
-
+      req.username = decodedInfo._doc.username;
       return RoleModel.find({ _id: { $in: decodedInfo._doc.roles }})
         .then(roles => {
           const names = roles.map(role => role.name);
