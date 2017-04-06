@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 const ObjectId = require('mongoose').Types.ObjectId;
 const config = require('../../config');
 const UserModel = require('../models/user.model');
+const AuditEventModel = require('../models/audit-event.model');
 
 exports.list = (req, res) => {
   const page = req.query.page || 1;
@@ -44,8 +45,11 @@ exports.create = (req, res) => {
     .then(user => {
       res.setHeader('Location',
         `${config.protocol}://${config.host}:${config.port}/users/${user._id}`);
-      return res.sendStatus(201);
+      return new AuditEventModel({ entity: 'User', entityId: user._id.toString(),
+        datetime: new Date(), username: req.username, action: 'CREATE' });
     })
+    .then(auditEvent => auditEvent.save())
+    .then(() => res.sendStatus(201))
     .catch(err => {
       if (err.message && err.message.includes('duplicate key error')) {
         return res.status(422).json({ error: 'Duplicated user' });
@@ -74,6 +78,9 @@ exports.delete = (req, res) => {
         return res.status(404).json({ error: 'User not found' });
       }
       return user.remove()
+        .then(() => new AuditEventModel({ entity: 'User', entityId: id,
+          datetime: new Date(), username: req.username, action: 'DELETE' }))
+        .then(auditEvent => auditEvent.save())
         .then(() => res.sendStatus(204));
   })
   .catch(() => res.status(500).json({ error: 'An unexpected error occurred' }));
