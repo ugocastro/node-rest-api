@@ -8,6 +8,7 @@ exports.findOne = (req, res) => {
   if (!ObjectId.isValid(id)) {
     return res.status(404).json({ error: 'Super power not found' });
   }
+
   SuperPowerModel.findOne({ _id: id })
     .exec()
     .then(superPower => {

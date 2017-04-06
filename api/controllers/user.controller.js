@@ -24,6 +24,13 @@ exports.list = (req, res) => {
 
 exports.create = (req, res) => {
   const body = req.body;
+  if (!body.username) {
+    return res.status(400).json({ error: 'Username is required' });
+  }
+  if (!body.password) {
+    return res.status(400).json({ error: 'Password is required' });
+  }
+
   Promise.resolve()
     .then(() => new UserModel(body))
     .then(user =>
@@ -38,5 +45,18 @@ exports.create = (req, res) => {
         `${config.protocol}://${config.host}:${config.port}/${user._id}`);
       return res.sendStatus(201);
     })
-    .catch(err => res.sendStatus(500).json(err));
+    .catch(err => {
+      if (err.message && err.message.includes('duplicate key error')) {
+        return res.status(422).json({ error: 'Duplicated user' });
+      }
+      if (err.errors && err.errors.roles) {
+        if (err.errors.roles.name === 'CastError') {
+          return res.status(400).json({ error: 'Invalid role id' });
+        }
+        if (err.errors.roles.name === 'ValidatorError') {
+          return res.status(400).json({ error: 'Role does not exist' });
+        }
+      }
+      return res.status(500).json(err);
+    });
 };

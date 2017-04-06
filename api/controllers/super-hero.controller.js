@@ -8,6 +8,7 @@ exports.findOne = (req, res) => {
   if (!ObjectId.isValid(id)) {
     return res.status(404).json({ error: 'Super hero not found' });
   }
+
   SuperHeroModel.findOne({ _id: id })
     .populate('protectionArea')
     .exec()

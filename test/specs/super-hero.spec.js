@@ -184,7 +184,7 @@ describe('Super heroes', () => {
         .then(superHero => superHero.save())
         .then(superHero => {
           chai.request(server)
-            .get(`/super-heroes/${superHero._id.toString().replace(/.$/,"0")}`)
+            .get(`/super-heroes/${superHero._id.toString().replace(/.$/,"z")}`)
             .set('x-access-token', authStub.mockValidToken())
             .set('content-type', 'application/json')
             .end((req, res) => {

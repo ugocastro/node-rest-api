@@ -91,4 +91,100 @@ describe('Users', () => {
         });
     });
   });
+
+  describe('POST /users', () => {
+    it('should return 201 with a valid user', done => {
+      chai.request(server)
+        .post('/users')
+        .send({ username: 'Administrator', password: '123' })
+        .set('x-access-token', authStub.mockValidToken())
+        .set('content-type', 'application/json')
+        .end((req, res) => {
+          res.should.have.status(201);
+          res.headers.should.have.property('location');
+          done();
+        });
+    });
+
+    it('should return 400 without username', done => {
+      chai.request(server)
+        .post('/users')
+        .send({ password: '123' })
+        .set('x-access-token', authStub.mockValidToken())
+        .set('content-type', 'application/json')
+        .end((req, res) => {
+          res.should.have.status(400);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.be.eql('Username is required');
+          done();
+        });
+    });
+
+    it('should return 400 without password', done => {
+      chai.request(server)
+        .post('/users')
+        .send({ username: 'user' })
+        .set('x-access-token', authStub.mockValidToken())
+        .set('content-type', 'application/json')
+        .end((req, res) => {
+          res.should.have.status(400);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.be.eql('Password is required');
+          done();
+        });
+    });
+
+    it('should return 400 with invalid role', done => {
+      chai.request(server)
+        .post('/users')
+        .send({ username: 'user', password: '123', roles: ['123'] })
+        .set('x-access-token', authStub.mockValidToken())
+        .set('content-type', 'application/json')
+        .end((req, res) => {
+          res.should.have.status(400);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.be.eql('Invalid role id');
+          done();
+        });
+    });
+
+    it('should return 400 with invalid role', done => {
+      chai.request(server)
+        .post('/users')
+        .send({ username: 'user', password: '123',
+          roles: ['58e5131e634a8d13f059930a'] })
+        .set('x-access-token', authStub.mockValidToken())
+        .set('content-type', 'application/json')
+        .end((req, res) => {
+          res.should.have.status(400);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.be.eql('Role does not exist');
+          done();
+        });
+    });
+
+    it('should return 422 with duplicated id', done => {
+      Promise.resolve(new UserModel({ username: 'Administrator',
+        password: '123' }))
+        .then(user => user.save())
+        .then(() => {
+          chai.request(server)
+            .post('/users')
+            .send({ username: 'Administrator', password: 'abc' })
+            .set('x-access-token', authStub.mockValidToken())
+            .set('content-type', 'application/json')
+            .end((req, res) => {
+              res.should.have.status(422);
+              res.body.should.be.a('object');
+              res.body.should.have.property('error');
+              res.body.error.should.be.eql('Duplicated user');
+              done();
+            });
+        });
+    });
+  });
 })

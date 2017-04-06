@@ -118,7 +118,7 @@ describe('Super powers', () => {
         .then(superPower => superPower.save())
         .then(superPower => {
           chai.request(server)
-            .get(`/super-powers/${superPower._id.toString().replace(/.$/,"0")}`)
+            .get(`/super-powers/${superPower._id.toString().replace(/.$/,"z")}`)
             .set('x-access-token', authStub.mockValidToken())
             .set('content-type', 'application/json')
             .end((req, res) => {
