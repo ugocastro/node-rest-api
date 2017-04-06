@@ -57,8 +57,10 @@ $ npm run coverage
 ### Reset development database
 The following command can be used to drop _development_ database and insert initial data, for example, roles and an administrator user.
 ```
-$ npm run reset-dev-db
+$ npm run seed-dev-db
 ```
+
+> **Notes:** Initial user info is: `{ username: 'admin', password: 'admin' }`. This must be used to retrieve the access token.
 
 ## License
 MIT.

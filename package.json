@@ -7,7 +7,7 @@
     "start": "export NODE_ENV=development && nodemon server.js",
     "test": "export NODE_ENV=test && mocha $(find test -name '*.spec.js')",
     "coverage": "export NODE_ENV=test && nyc --check-coverage --lines 60 --reporter=html --reporter=text mocha $(find test -name '*.spec.js')",
-    "reset-dev-db": "mongo localhost:27017/super-heroes-development scripts/reset-database.script.js"
+    "seed-dev-db": "mongo localhost:27017/super-heroes-development scripts/database-seed.script.js"
   },
   "repository": {
     "type": "git",
