@@ -105,4 +105,96 @@ describe('Super heroes', () => {
         });
     });
   });
+
+  describe('GET /super-heroes/:id', () => {
+    it('should return 200 with a valid id', done => {
+      Promise.resolve(new ProtectionAreaModel({ name: 'Gotham',
+        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        .then(area => area.save())
+        .then(area => {
+          this.protectionArea = area;
+          return new SuperPowerModel({ name: "Utilities' belt" });
+        })
+        .then(superPower => superPower.save())
+        .then(superPower => {
+          this.superPower = superPower;
+          return new SuperHeroModel({ name: 'Batman', alias: 'Bruce Wayne',
+            protectionArea: this.protectionArea._id, superPowers: [this.superPower._id] });
+        })
+        .then(superHero => superHero.save())
+        .then(superHero => {
+          chai.request(server)
+            .get(`/super-heroes/${superHero._id}`)
+            .set('x-access-token', authStub.mockValidToken())
+            .set('content-type', 'application/json')
+            .end((req, res) => {
+              res.should.have.status(200);
+              res.body.should.be.a('object');
+              res.body.should.have.property('name');
+              res.body.name.should.be.eql(superHero.name);
+              done();
+            });
+        });
+    });
+
+    it('should return 404 with an invalid id', done => {
+      Promise.resolve(new ProtectionAreaModel({ name: 'Gotham',
+        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        .then(area => area.save())
+        .then(area => {
+          this.protectionArea = area;
+          return new SuperPowerModel({ name: "Utilities' belt" });
+        })
+        .then(superPower => superPower.save())
+        .then(superPower => {
+          this.superPower = superPower;
+          return new SuperHeroModel({ name: 'Batman', alias: 'Bruce Wayne',
+            protectionArea: this.protectionArea._id, superPowers: [this.superPower._id] });
+        })
+        .then(superHero => superHero.save())
+        .then(superHero => {
+          chai.request(server)
+            .get(`/super-heroes/invalid-id`)
+            .set('x-access-token', authStub.mockValidToken())
+            .set('content-type', 'application/json')
+            .end((req, res) => {
+              res.should.have.status(404);
+              res.body.should.be.a('object');
+              res.body.should.have.property('error');
+              res.body.error.should.be.eql('Super hero not found');
+              done();
+            });
+        });
+    });
+
+    it('should return 404 with an id that does not exist', done => {
+      Promise.resolve(new ProtectionAreaModel({ name: 'Gotham',
+        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        .then(area => area.save())
+        .then(area => {
+          this.protectionArea = area;
+          return new SuperPowerModel({ name: "Utilities' belt" });
+        })
+        .then(superPower => superPower.save())
+        .then(superPower => {
+          this.superPower = superPower;
+          return new SuperHeroModel({ name: 'Batman', alias: 'Bruce Wayne',
+            protectionArea: this.protectionArea._id, superPowers: [this.superPower._id] });
+        })
+        .then(superHero => superHero.save())
+        .then(superHero => {
+          chai.request(server)
+            .get(`/super-heroes/${superHero._id.toString().replace(/.$/,"0")}`)
+            .set('x-access-token', authStub.mockValidToken())
+            .set('content-type', 'application/json')
+            .end((req, res) => {
+              res.should.have.status(404);
+              res.body.should.be.a('object');
+              res.body.should.have.property('error');
+              res.body.error.should.be.eql('Super hero not found');
+              done();
+            });
+        });
+    });
+  });
 })

@@ -1,6 +1,24 @@
 'use strict';
 
+const ObjectId = require('mongoose').Types.ObjectId;
 const SuperHeroModel = require('../models/super-hero.model');
+
+exports.findOne = (req, res) => {
+  const id = req.params.id;
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).json({ error: 'Super hero not found' });
+  }
+  SuperHeroModel.findOne({ _id: id })
+    .populate('protectionArea')
+    .exec()
+    .then(superHero => {
+      if (superHero) {
+        return res.json(superHero);
+      }
+      return res.status(404).json({ error: 'Super hero not found' });
+    })
+    .catch((err) => res.status(500).json(err));
+};
 
 exports.list = (req, res) => {
   const page = req.query.page || 1;
