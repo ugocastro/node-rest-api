@@ -75,3 +75,20 @@ exports.create = (req, res) => {
       return res.status(500).json({ error: 'An unexpected error occurred' });
     });
 };
+
+exports.delete = (req, res) => {
+  const id = req.params.id;
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).json({ error: 'Super hero not found' });
+  }
+
+  SuperHeroModel.findOne({ _id: id })
+    .then(superHero => {
+      if (!superHero) {
+        return res.status(404).json({ error: 'Super hero not found' });
+      }
+      return superHero.remove()
+        .then(() => res.sendStatus(204));
+  })
+  .catch(() => res.status(500).json({ error: 'An unexpected error occurred' }));
+};

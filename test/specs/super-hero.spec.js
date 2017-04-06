@@ -324,7 +324,7 @@ describe('Super heroes', () => {
         .then(area => { this.protectionArea = area; })
         .then(() => new SuperHeroModel({ name: 'Batman', alias: 'Bruce Wayne',
           protectionArea: this.protectionArea._id }))
-        .then((superHero) => superHero.save())
+        .then(superHero => superHero.save())
         .then(() => {
           chai.request(server)
             .post('/super-heroes')
@@ -339,6 +339,56 @@ describe('Super heroes', () => {
               res.body.error.should.be.eql('Duplicated super hero');
               done();
             });
+        });
+    });
+  });
+
+  describe('DELETE /super-heroes/:id', () => {
+    it('should return 204 with a valid id', done => {
+      Promise.resolve(new ProtectionAreaModel({ name: 'Gotham',
+        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        .then(area => area.save())
+        .then(area => { this.protectionArea = area; })
+        .then(() => new SuperHeroModel({ name: 'Batman', alias: 'Bruce Wayne',
+          protectionArea: this.protectionArea._id }))
+        .then(superHero => superHero.save())
+        .then(superHero => {
+          chai.request(server)
+            .delete(`/super-heroes/${superHero._id}`)
+            .set('x-access-token', authStub.mockValidToken())
+            .set('content-type', 'application/json')
+            .end((req, res) => {
+              res.should.have.status(204);
+              done();
+            });
+        });
+    });
+
+    it('should return 404 with an invalid id', done => {
+      chai.request(server)
+        .delete('/super-heroes/invalid-id')
+        .set('x-access-token', authStub.mockValidToken())
+        .set('content-type', 'application/json')
+        .end((req, res) => {
+          res.should.have.status(404);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.be.eql('Super hero not found');
+          done();
+        });
+    });
+
+    it('should return 404 with an id that does not exist', done => {
+      chai.request(server)
+        .delete('/super-heroes/58e5131e634a8d13f059930c')
+        .set('x-access-token', authStub.mockValidToken())
+        .set('content-type', 'application/json')
+        .end((req, res) => {
+          res.should.have.status(404);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.be.eql('Super hero not found');
+          done();
         });
     });
   });

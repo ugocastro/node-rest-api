@@ -8,5 +8,6 @@ module.exports = app => {
     .post(superHeroController.create);
 
   app.route('/super-heroes/:id')
-    .get(superHeroController.findOne);
+    .get(superHeroController.findOne)
+    .delete(superHeroController.delete);
 };
