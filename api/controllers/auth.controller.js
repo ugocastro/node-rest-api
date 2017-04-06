@@ -5,6 +5,13 @@ const jwt = require('jsonwebtoken');
 const config = require('../../config');
 const UserModel = require('../models/user.model');
 
+/**
+* Get username and password to check authentication.
+* @function
+* @param {object} req - Express' request object.
+* @param {object} res - Express' response object.
+* @returns {object} A HTTP status 200 response with a token.
+*/
 exports.authenticate = (req, res) => {
   UserModel.findOne({ username: req.body.username })
     .then(user => {
