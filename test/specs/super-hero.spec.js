@@ -70,7 +70,6 @@ describe('Super heroes', () => {
 
     it('should return 200 with all super heroes', done => {
       const superHeroes = [];
-      const limit = 1;
       Promise.resolve(new ProtectionAreaModel({ name: 'Gotham',
         latitude: 12.343, longitude: 35.978, radius: 5 }))
         .then(area => area.save())
