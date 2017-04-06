@@ -2,6 +2,7 @@
 
 const mongoose = require('mongoose');
 const idValidator = require('mongoose-id-validator');
+const RoleModel = require('./role.model');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema ({

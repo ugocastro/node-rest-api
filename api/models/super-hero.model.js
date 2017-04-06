@@ -2,6 +2,8 @@
 
 const mongoose = require('mongoose');
 const idValidator = require('mongoose-id-validator');
+const ProtectionArea = require('./protection-area.model');
+const SuperPowerModel = require('./super-power.model');
 const Schema = mongoose.Schema;
 
 const superHeroSchema = new Schema ({
