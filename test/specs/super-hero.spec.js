@@ -6,8 +6,9 @@ const server = require('../../server');
 const config = require ('../../config');
 const ProtectionAreaModel = require('../../api/models/protection-area.model');
 const SuperHeroModel = require('../../api/models/super-hero.model');
-const SuperPowerModel = require('../../api/models/super-power.model')
-const RoleModel = require('../../api/models/role.model')
+const SuperPowerModel = require('../../api/models/super-power.model');
+const RoleModel = require('../../api/models/role.model');
+const UserModel = require('../../api/models/user.model');
 const authStub = require('../stubs/auth.stub');
 const should = chai.should();
 
@@ -18,6 +19,11 @@ describe('Super heroes', () => {
     RoleModel.remove({})
       .then(() => new RoleModel({ _id: '58e5131e634a8d13f059930a', name: 'Admin' }))
       .then(role => role.save())
+      .then(() => UserModel.remove({}))
+      .then(() => new UserModel({ _id: '58e5131e634a8d13f059930c', username: 'admin',
+        password: '$2a$10$Syj8AUP1Gts8rjWW.A4wLujZ54Wnag7SoF09hqEOmkuRSUdk9P4vC',
+        roles:['58e5131e634a8d13f059930a'] }))
+      .then(user => user.save())
       .then(() => done());
   });
 

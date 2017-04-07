@@ -8,5 +8,6 @@ module.exports = app => {
     .post(userController.create);
 
   app.route('/users/:id')
+    .put(userController.update)
     .delete(userController.delete);
 };

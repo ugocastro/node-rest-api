@@ -8,6 +8,7 @@ const SuperPowerModel = require('../../api/models/super-power.model');
 const SuperHeroModel = require('../../api/models/super-hero.model');
 const ProtectionAreaModel = require('../../api/models/protection-area.model');
 const RoleModel = require('../../api/models/role.model');
+const UserModel = require('../../api/models/user.model');
 const authStub = require('../stubs/auth.stub');
 const should = chai.should();
 
@@ -18,6 +19,11 @@ describe('Super powers', () => {
     RoleModel.remove({})
       .then(() => new RoleModel({ _id: '58e5131e634a8d13f059930a', name: 'Admin' }))
       .then(role => role.save())
+      .then(() => UserModel.remove({}))
+      .then(() => new UserModel({ _id: '58e5131e634a8d13f059930c', username: 'admin',
+        password: '$2a$10$Syj8AUP1Gts8rjWW.A4wLujZ54Wnag7SoF09hqEOmkuRSUdk9P4vC',
+        roles:['58e5131e634a8d13f059930a'] }))
+      .then(user => user.save())
       .then(() => done());
   });
 
@@ -294,20 +300,6 @@ describe('Super powers', () => {
           res.body.should.be.a('object');
           res.body.should.have.property('error');
           res.body.error.should.be.eql('Id must not be sent on update');
-          done();
-        });
-    });
-
-    it('should return 400 without name', done => {
-      chai.request(server)
-        .put('/super-powers/58e5131e634a8d13f059930c')
-        .set('x-access-token', authStub.mockAdminToken())
-        .set('content-type', 'application/json')
-        .end((req, res) => {
-          res.should.have.status(400);
-          res.body.should.be.a('object');
-          res.body.should.have.property('error');
-          res.body.error.should.be.eql('Name is required');
           done();
         });
     });

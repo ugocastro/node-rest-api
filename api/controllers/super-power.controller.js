@@ -70,9 +70,6 @@ exports.update = (req, res) => {
   if (body._id) {
     return res.status(400).json({ error: 'Id must not be sent on update' });
   }
-  if (!body.name) {
-    return res.status(400).json({ error: 'Name is required' });
-  }
 
   SuperPowerModel.findOne({ _id: id })
     .then(superPower => {
@@ -82,7 +79,7 @@ exports.update = (req, res) => {
       Object.assign(superPower, body);
       return superPower.save()
         .then(superPower => {
-          return new AuditEventModel({ entity: 'SuperPower', entityId: superPower._id.toString(),
+          return new AuditEventModel({ entity: 'SuperPower', entityId: id,
             datetime: new Date(), username: req.username, action: 'UPDATE' });
         })
         .then(auditEvent => auditEvent.save())
