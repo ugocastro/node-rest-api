@@ -21,7 +21,7 @@ module.exports = (req, res, next) => {
               .then(roles => {
                 const names = roles.map(role => role.name);
                 if (!names.find(name => name === 'Admin')) {
-                  if (!names.find(name => name !== 'Standard')) {
+                  if (!names.find(name => name === 'Standard')) {
                     return res.status(403)
                       .json({ error: 'User does not have permission to access this route' });
                   }

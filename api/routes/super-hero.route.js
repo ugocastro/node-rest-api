@@ -9,5 +9,6 @@ module.exports = app => {
 
   app.route('/super-heroes/:id')
     .get(superHeroController.findOne)
+    .put(superHeroController.update)
     .delete(superHeroController.delete);
 };

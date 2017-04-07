@@ -130,20 +130,16 @@ describe('Super powers', () => {
     });
 
     it('should return 404 with an id that does not exist', done => {
-      Promise.resolve(new SuperPowerModel({ name: 'x-ray' }))
-        .then(superPower => superPower.save())
-        .then(superPower => {
-          chai.request(server)
-            .get(`/super-powers/${superPower._id.toString().replace(/.$/,"z")}`)
-            .set('x-access-token', authStub.mockAdminToken())
-            .set('content-type', 'application/json')
-            .end((req, res) => {
-              res.should.have.status(404);
-              res.body.should.be.a('object');
-              res.body.should.have.property('error');
-              res.body.error.should.be.eql('Super power not found');
-              done();
-            });
+      chai.request(server)
+        .get('/super-powers/58e5131e634a8d13f059930b')
+        .set('x-access-token', authStub.mockAdminToken())
+        .set('content-type', 'application/json')
+        .end((req, res) => {
+          res.should.have.status(404);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.be.eql('Super power not found');
+          done();
         });
     });
   });

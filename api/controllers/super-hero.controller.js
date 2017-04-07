@@ -80,6 +80,51 @@ exports.create = (req, res) => {
     });
 };
 
+exports.update = (req, res) => {
+  const id = req.params.id;
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).json({ error: 'Super hero not found' });
+  }
+
+  const body = req.body;
+  if (body._id) {
+    return res.status(400).json({ error: 'Id must not be sent on update' });
+  }
+
+  SuperHeroModel.findOne({ _id: id })
+    .then(superHero => {
+      if (!superHero) {
+        return res.status(404).json({ error: 'Super hero not found' });
+      }
+      Object.assign(superHero, body);
+      return superHero.save()
+        .then(superHero => {
+          return new AuditEventModel({ entity: 'SuperHero', entityId: id,
+            datetime: new Date(), username: req.username, action: 'UPDATE' });
+        })
+        .then(auditEvent => auditEvent.save())
+        .then(() => res.sendStatus(204));
+    })
+    .catch(err => {
+      if (err.message && err.message.includes('duplicate key error')) {
+        return res.status(422).json({ error: 'Duplicated super hero' });
+      }
+      if (err.errors) {
+        if ((err.errors.protectionArea && err.errors.protectionArea.name === 'CastError')
+          || (err.errors.superPowers && err.errors.superPowers.name === 'CastError')) {
+            return res.status(400)
+              .json({ error: 'Invalid (protection area/super power) id' });
+          }
+        if ((err.errors.protectionArea && err.errors.protectionArea.name === 'ValidatorError')
+          || (err.errors.superPowers && err.errors.superPowers.name === 'ValidatorError')) {
+            return res.status(400)
+              .json({ error: '(Protection area/super power) does not exist' });
+          }
+      }
+      return res.status(500).json({ error: 'An unexpected error occurred' });
+    });
+};
+
 exports.delete = (req, res) => {
   const id = req.params.id;
   if (!ObjectId.isValid(id)) {
