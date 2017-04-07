@@ -2,7 +2,7 @@
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const server = require('../../server');
+const server = require('../../server').app;
 const config = require ('../../config');
 const ProtectionAreaModel = require('../../api/models/protection-area.model');
 const SuperHeroModel = require('../../api/models/super-hero.model');

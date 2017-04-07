@@ -2,7 +2,7 @@
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const server = require('../../server');
+const server = require('../../server').app;
 const config = require ('../../config');
 const authStub = require('../stubs/auth.stub');
 const RoleModel = require('../../api/models/role.model');

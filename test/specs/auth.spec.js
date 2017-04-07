@@ -3,7 +3,7 @@
 const bcrypt = require('bcrypt');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const server = require('../../server');
+const server = require('../../server').app;
 const config = require ('../../config');
 const UserModel = require('../../api/models/user.model');
 const should = chai.should();

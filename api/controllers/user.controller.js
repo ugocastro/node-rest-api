@@ -3,6 +3,7 @@
 const bcrypt = require('bcrypt');
 const ObjectId = require('mongoose').Types.ObjectId;
 const config = require('../../config');
+const websocketUtil = require('../utils/websocket.util');
 const UserModel = require('../models/user.model');
 const AuditEventModel = require('../models/audit-event.model');
 
@@ -34,7 +35,7 @@ exports.list = (req, res) => {
 };
 
 /**
-* Creates an user and includes an audit event on database.
+* Creates an user, includes an audit event on database and emits that event to connected clients.
 * @function create
 * @param {object} req - Express' request object.
 * @param {object} res - Express' response object.
@@ -67,6 +68,7 @@ exports.create = (req, res) => {
         datetime: new Date(), username: req.username, action: 'CREATE' });
     })
     .then(auditEvent => auditEvent.save())
+    .then(auditEvent => websocketUtil.emit(auditEvent))
     .then(() => res.sendStatus(201))
     .catch(err => {
       if (err.message && err.message.includes('duplicate key error')) {
@@ -85,7 +87,7 @@ exports.create = (req, res) => {
 };
 
 /**
-* Updates an user and includes an audit event on database.
+* Updates an user, includes an audit event on database and emits that event to connected clients.
 * @function update
 * @param {object} req - Express' request object.
 * @param {object} res - Express' response object.
@@ -126,6 +128,7 @@ exports.update = (req, res) => {
             datetime: new Date(), username: req.username, action: 'UPDATE' });
         })
         .then(auditEvent => auditEvent.save())
+        .then(auditEvent => websocketUtil.emit(auditEvent))
         .then(() => res.sendStatus(204));
     })
     .catch(err => {
@@ -145,7 +148,7 @@ exports.update = (req, res) => {
 };
 
 /**
-* Removes an user and includes an audit event on database.
+* Removes an user, includes an audit event on database and emits that event to connected clients.
 * @function delete
 * @param {object} req - Express' request object.
 * @param {object} res - Express' response object.
@@ -167,6 +170,7 @@ exports.delete = (req, res) => {
         .then(() => new AuditEventModel({ entity: 'User', entityId: id,
           datetime: new Date(), username: req.username, action: 'DELETE' }))
         .then(auditEvent => auditEvent.save())
+        .then(auditEvent => websocketUtil.emit(auditEvent))
         .then(() => res.sendStatus(204));
   })
   .catch(() => res.status(500).json({ error: 'An unexpected error occurred' }));

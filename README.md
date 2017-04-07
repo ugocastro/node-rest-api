@@ -37,7 +37,7 @@ $ npm start
 ```
 Press `Ctrl+C` to stop running the application.
 
-> **Notes:** The application will be hosted at *http://127.0.0.1:3000/*.
+> **Notes:** The application will be hosted at *http://127.0.0.1:3000/*. Clients can connect to a web socket in order to receive auditing events on endpoint */socket.io*.
 
 ### Test
 Execute the following command:

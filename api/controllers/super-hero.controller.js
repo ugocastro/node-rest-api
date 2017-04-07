@@ -2,6 +2,7 @@
 
 const ObjectId = require('mongoose').Types.ObjectId;
 const config = require('../../config');
+const websocketUtil = require('../utils/websocket.util');
 const SuperHeroModel = require('../models/super-hero.model');
 const AuditEventModel = require('../models/audit-event.model');
 
@@ -55,7 +56,7 @@ exports.list = (req, res) => {
 };
 
 /**
-* Creates a super hero and includes an audit event on database.
+* Creates a super hero, includes an audit event on database and emits that event to connected clients.
 * @function create
 * @param {object} req - Express' request object.
 * @param {object} res - Express' response object.
@@ -85,6 +86,7 @@ exports.create = (req, res) => {
         datetime: new Date(), username: req.username, action: 'CREATE' })
     })
     .then(auditEvent => auditEvent.save())
+    .then(auditEvent => websocketUtil.emit(auditEvent))
     .then(() => res.sendStatus(201))
     .catch(err => {
       if (err.message && err.message.includes('duplicate key error')) {
@@ -102,12 +104,13 @@ exports.create = (req, res) => {
               .json({ error: '(Protection area/super power) does not exist' });
           }
       }
+      console.log(err)
       return res.status(500).json({ error: 'An unexpected error occurred' });
     });
 };
 
 /**
-* Updates a super hero and includes an audit event on database.
+* Updates a super hero, includes an audit event on database and emits that event to connected clients.
 * @function update
 * @param {object} req - Express' request object.
 * @param {object} res - Express' response object.
@@ -138,6 +141,7 @@ exports.update = (req, res) => {
             datetime: new Date(), username: req.username, action: 'UPDATE' });
         })
         .then(auditEvent => auditEvent.save())
+        .then(auditEvent => websocketUtil.emit(auditEvent))
         .then(() => res.sendStatus(204));
     })
     .catch(err => {
@@ -161,7 +165,7 @@ exports.update = (req, res) => {
 };
 
 /**
-* Removes a super hero and includes an audit event on database.
+* Removes a super hero, includes an audit event on database and emits that event to connected clients.
 * @function delete
 * @param {object} req - Express' request object.
 * @param {object} res - Express' response object.
@@ -183,6 +187,7 @@ exports.delete = (req, res) => {
         .then(() => new AuditEventModel({ entity: 'SuperHero', entityId: id,
           datetime: new Date(), username: req.username, action: 'DELETE' }))
         .then(auditEvent => auditEvent.save())
+        .then(auditEvent => websocketUtil.emit(auditEvent))
         .then(() => res.sendStatus(204));
   })
   .catch(() => res.status(500).json({ error: 'An unexpected error occurred' }));
