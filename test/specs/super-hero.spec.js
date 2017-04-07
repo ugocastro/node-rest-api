@@ -51,7 +51,7 @@ describe('Super heroes', () => {
     it('should return 200 with a subset of super heroes', done => {
       const limit = 1;
       Promise.resolve(new ProtectionAreaModel({ name: 'Gotham',
-        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        location: { type: 'Point', coordinates: [-74, 40.74] }, radius: 5 }))
         .then(area => area.save())
         .then(area => {
           this.protectionArea = area;
@@ -85,7 +85,7 @@ describe('Super heroes', () => {
     it('should return 200 with all super heroes', done => {
       const superHeroes = [];
       Promise.resolve(new ProtectionAreaModel({ name: 'Gotham',
-        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        location: { type: 'Point', coordinates: [-74, 40.74] }, radius: 5 }))
         .then(area => area.save())
         .then(area => {
           this.protectionArea = area;
@@ -123,7 +123,7 @@ describe('Super heroes', () => {
   describe('GET /super-heroes/:id', () => {
     it('should return 200 with a valid id', done => {
       Promise.resolve(new ProtectionAreaModel({ name: 'Gotham',
-        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        location: { type: 'Point', coordinates: [-74, 40.74] }, radius: 5 }))
         .then(area => area.save())
         .then(area => {
           this.protectionArea = area;
@@ -153,7 +153,7 @@ describe('Super heroes', () => {
 
     it('should return 404 with an invalid id', done => {
       Promise.resolve(new ProtectionAreaModel({ name: 'Gotham',
-        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        location: { type: 'Point', coordinates: [-74, 40.74] }, radius: 5 }))
         .then(area => area.save())
         .then(area => {
           this.protectionArea = area;
@@ -183,7 +183,7 @@ describe('Super heroes', () => {
 
     it('should return 404 with an id that does not exist', done => {
       Promise.resolve(new ProtectionAreaModel({ name: 'Gotham',
-        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        location: { type: 'Point', coordinates: [-74, 40.74] }, radius: 5 }))
         .then(area => area.save())
         .then(area => {
           this.protectionArea = area;
@@ -215,7 +215,7 @@ describe('Super heroes', () => {
   describe('POST /super-heroes', () => {
     it('should return 201 with a valid super hero', done => {
       Promise.resolve(new ProtectionAreaModel({ name: 'Gotham',
-        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        location: { type: 'Point', coordinates: [-74, 40.74] }, radius: 5 }))
         .then(area => area.save())
         .then(area => { this.protectionArea = area; })
         .then(() => {
@@ -295,7 +295,7 @@ describe('Super heroes', () => {
 
     it('should return 400 with invalid super power id', done => {
       Promise.resolve(new ProtectionAreaModel({ name: 'Gotham',
-        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        location: { type: 'Point', coordinates: [-74, 40.74] }, radius: 5 }))
         .then(area => area.save())
         .then(area => { this.protectionArea = area; })
         .then(() => {
@@ -333,7 +333,7 @@ describe('Super heroes', () => {
 
     it('should return 400 with super power id that does not exist', done => {
       Promise.resolve(new ProtectionAreaModel({ name: 'Gotham',
-        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        location: { type: 'Point', coordinates: [-74, 40.74] }, radius: 5 }))
         .then(area => area.save())
         .then(area => { this.protectionArea = area; })
         .then(() => {
@@ -356,7 +356,7 @@ describe('Super heroes', () => {
 
     it('should return 422 with duplicated super hero', done => {
       Promise.resolve(new ProtectionAreaModel({ name: 'Gotham',
-        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        location: { type: 'Point', coordinates: [-74, 40.74] }, radius: 5 }))
         .then(area => area.save())
         .then(area => { this.protectionArea = area; })
         .then(() => new SuperHeroModel({ name: 'Batman', alias: 'Bruce Wayne',
@@ -383,7 +383,7 @@ describe('Super heroes', () => {
   describe('DELETE /super-heroes/:id', () => {
     it('should return 204 with a valid id', done => {
       Promise.resolve(new ProtectionAreaModel({ name: 'Gotham',
-        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        location: { type: 'Point', coordinates: [-74, 40.74] }, radius: 5 }))
         .then(area => area.save())
         .then(area => { this.protectionArea = area; })
         .then(() => new SuperHeroModel({ name: 'Batman', alias: 'Bruce Wayne',
@@ -433,7 +433,7 @@ describe('Super heroes', () => {
   describe('UPDATE /super-heroes/:id', () => {
     it('should return 204 with a new name', done => {
       Promise.resolve(new ProtectionAreaModel({ name: 'Rain forest',
-        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        location: { type: 'Point', coordinates: [-74, 40.74] }, radius: 5 }))
         .then(area => area.save())
         .then(area => new SuperHeroModel({ name: 'Wolverine', alias: 'Logan',
           protectionArea: area }))
@@ -468,7 +468,7 @@ describe('Super heroes', () => {
 
     it('should return 400 with invalid protection area id', done => {
       Promise.resolve(new ProtectionAreaModel({ name: 'Rain forest',
-        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        location: { type: 'Point', coordinates: [-74, 40.74] }, radius: 5 }))
         .then(area => area.save())
         .then(area => new SuperHeroModel({ name: 'Wolverine', alias: 'Logan',
           protectionArea: area }))
@@ -491,7 +491,7 @@ describe('Super heroes', () => {
 
     it('should return 400 with invalid super power id', done => {
       Promise.resolve(new ProtectionAreaModel({ name: 'Rain forest',
-        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        location: { type: 'Point', coordinates: [-74, 40.74] }, radius: 5 }))
         .then(area => area.save())
         .then(area => new SuperHeroModel({ name: 'Wolverine', alias: 'Logan',
           protectionArea: area }))
@@ -514,7 +514,7 @@ describe('Super heroes', () => {
 
     it('should return 400 with protection area id that does not exist', done => {
       Promise.resolve(new ProtectionAreaModel({ name: 'Rain forest',
-        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        location: { type: 'Point', coordinates: [-74, 40.74] }, radius: 5 }))
         .then(area => area.save())
         .then(area => new SuperHeroModel({ name: 'Wolverine', alias: 'Logan',
           protectionArea: area }))
@@ -537,7 +537,7 @@ describe('Super heroes', () => {
 
     it('should return 400 with super power id that does not exist', done => {
       Promise.resolve(new ProtectionAreaModel({ name: 'Rain forest',
-        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        location: { type: 'Point', coordinates: [-74, 40.74] }, radius: 5 }))
         .then(area => area.save())
         .then(area => new SuperHeroModel({ name: 'Wolverine', alias: 'Logan',
           protectionArea: area }))
@@ -589,7 +589,7 @@ describe('Super heroes', () => {
 
     it('should return 422 with duplicated super hero', done => {
       Promise.resolve(new ProtectionAreaModel({ name: 'NY',
-        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        location: { type: 'Point', coordinates: [-74, 40.74] }, radius: 5 }))
         .then(area => area.save())
         .then(area => { this.protectionArea = area; })
         .then(() => new SuperHeroModel({ name: 'Flash', alias: 'Flash',

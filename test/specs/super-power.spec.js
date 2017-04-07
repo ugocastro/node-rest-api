@@ -239,7 +239,7 @@ describe('Super powers', () => {
 
     it('should return 422 with a super power associated with a super hero', done => {
       Promise.resolve(new ProtectionAreaModel({ name: 'Gotham',
-        latitude: 12.343, longitude: 35.978, radius: 5 }))
+        location: { type: 'Point', coordinates: [-74, 40.74] }, radius: 5 }))
         .then(area => area.save())
         .then(area => {
           this.protectionArea = area;

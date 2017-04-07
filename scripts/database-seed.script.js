@@ -8,6 +8,6 @@ db.users.insert({ _id: ObjectId('58e5131e634a8d13f059930c'), username: 'admin',
   roles:[ObjectId('58e5131e634a8d13f059930a')], __v: 0 });
 
 db.protectionareas.insert({ _id: ObjectId('58e5131e634a8d13f059930d'), name: 'Gotham',
-  latitude: 12.343, longitude: 35.978, radius: 5, __v: 0 });
+  location: { type: 'Point', coordinates: [-74, 40.74] }, radius: 5, __v: 0 });
 db.protectionareas.insert({ _id: ObjectId('58e5131e634a8d13f059930e'), name: 'New York',
-  latitude: 22.124, longitude: 41.073, radius: 10, __v: 0 });
+  location: { type: 'Point', coordinates: [-23, 21.70] }, radius: 10, __v: 0 });

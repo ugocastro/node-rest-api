@@ -34,7 +34,11 @@ mongoose.connect(`mongodb://${config.host}/${config.database}`, err => {
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(expressValidator());
+app.use(expressValidator({
+  customValidators: {
+    isFloat: (value) => Number.parseFloat(value)
+  }
+}));
 app.use(checkContentType);
 
 authRoute(app);

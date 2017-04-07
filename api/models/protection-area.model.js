@@ -9,19 +9,23 @@ const protectionAreaSchema = new Schema ({
     unique: true,
     required: true
   },
-  latitude: {
-    type: Number,
-    required: true
-  },
-  longitude: {
-    type: Number,
-    required: true
+  location: {
+    type: {
+      type: String,
+      required: true
+    },
+    coordinates: [{
+      type: Number,
+      required: true
+    }]
   },
   radius: {
     type: Number,
     required: true
   }
 });
+
+protectionAreaSchema.index({ 'location': '2dsphere' });
 
 /**
 * Protection area schema.
