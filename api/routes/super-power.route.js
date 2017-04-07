@@ -9,5 +9,6 @@ module.exports = app => {
 
   app.route('/super-powers/:id')
     .get(superPowerController.findOne)
+    .put(superPowerController.update)
     .delete(superPowerController.delete);
 };

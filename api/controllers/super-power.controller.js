@@ -60,6 +60,42 @@ exports.create = (req, res) => {
     });
 };
 
+exports.update = (req, res) => {
+  const id = req.params.id;
+  if (!ObjectId.isValid(id)) {
+    return res.status(404).json({ error: 'Super power not found' });
+  }
+
+  const body = req.body;
+  if (body._id) {
+    return res.status(400).json({ error: 'Id must not be sent on update' });
+  }
+  if (!body.name) {
+    return res.status(400).json({ error: 'Name is required' });
+  }
+
+  SuperPowerModel.findOne({ _id: id })
+    .then(superPower => {
+      if (!superPower) {
+        return res.status(404).json({ error: 'Super power not found' });
+      }
+      Object.assign(superPower, body);
+      return superPower.save()
+        .then(superPower => {
+          return new AuditEventModel({ entity: 'SuperPower', entityId: superPower._id.toString(),
+            datetime: new Date(), username: req.username, action: 'UPDATE' });
+        })
+        .then(auditEvent => auditEvent.save())
+        .then(() => res.sendStatus(204));
+    })
+    .catch(err => {
+      if (err.message && err.message.includes('duplicate key error')) {
+        return res.status(422).json({ error: 'Duplicated super power' });
+      }
+      return res.status(500).json({ error: 'An unexpected error occurred' });
+    });
+};
+
 exports.delete = (req, res) => {
   const id = req.params.id;
   if (!ObjectId.isValid(id)) {

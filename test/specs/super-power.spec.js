@@ -265,4 +265,101 @@ describe('Super powers', () => {
         });
     });
   });
-})
+
+  describe('UPDATE /super-powers/:id', () => {
+    it('should return 204 with a new name', done => {
+      Promise.resolve(new SuperPowerModel({ name: 'explosive cards' }))
+        .then(superPower => superPower.save())
+        .then(superPower => {
+          chai.request(server)
+            .put(`/super-powers/${superPower._id}`)
+            .send({ name: 'x-ray' })
+            .set('x-access-token', authStub.mockAdminToken())
+            .set('content-type', 'application/json')
+            .end((req, res) => {
+              res.should.have.status(204);
+              done();
+            });
+      });
+    });
+
+    it('should return 400 with _id being sent', done => {
+      chai.request(server)
+        .put('/super-powers/58e5131e634a8d13f059930c')
+        .send({ _id: 'fae2331e634a8d13f059930a' })
+        .set('x-access-token', authStub.mockAdminToken())
+        .set('content-type', 'application/json')
+        .end((req, res) => {
+          res.should.have.status(400);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.be.eql('Id must not be sent on update');
+          done();
+        });
+    });
+
+    it('should return 400 without name', done => {
+      chai.request(server)
+        .put('/super-powers/58e5131e634a8d13f059930c')
+        .set('x-access-token', authStub.mockAdminToken())
+        .set('content-type', 'application/json')
+        .end((req, res) => {
+          res.should.have.status(400);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.be.eql('Name is required');
+          done();
+        });
+    });
+
+    it('should return 404 with an invalid id', done => {
+      chai.request(server)
+        .put('/super-powers/invalid-id')
+        .set('x-access-token', authStub.mockAdminToken())
+        .set('content-type', 'application/json')
+        .end((req, res) => {
+          res.should.have.status(404);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.be.eql('Super power not found');
+          done();
+        });
+    });
+
+    it('should return 404 with an id that does not exist', done => {
+      chai.request(server)
+        .put('/super-powers/58e5131e634a8d13f059930c')
+        .send({ name: 'some super power' })
+        .set('x-access-token', authStub.mockAdminToken())
+        .set('content-type', 'application/json')
+        .end((req, res) => {
+          res.should.have.status(404);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error');
+          res.body.error.should.be.eql('Super power not found');
+          done();
+        });
+    });
+
+    it('should return 422 with a duplicated name', done => {
+      Promise.resolve(new SuperPowerModel({ name: 'explosive cards' }))
+        .then(superPower => superPower.save())
+        .then(() => new SuperPowerModel({ name: 'adamantium claws' }))
+        .then(superPower => superPower.save())
+        .then(superPower => {
+          chai.request(server)
+            .put(`/super-powers/${superPower._id}`)
+            .send({ name: 'explosive cards' })
+            .set('x-access-token', authStub.mockAdminToken())
+            .set('content-type', 'application/json')
+            .end((req, res) => {
+              res.should.have.status(422);
+              res.body.should.be.a('object');
+              res.body.should.have.property('error');
+              res.body.error.should.be.eql('Duplicated super power');
+              done();
+            });
+      });
+    });
+  });
+});
