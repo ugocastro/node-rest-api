@@ -50,4 +50,8 @@ app.listen(config.port, err => {
     + `${config.protocol}://${config.host}:${config.port}`);
 });
 
+/**
+* Exports application (to be used on tests, for example).
+* @module
+*/
 module.exports = app;

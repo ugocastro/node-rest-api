@@ -6,6 +6,15 @@ const config = require('../../config');
 const UserModel = require('../models/user.model');
 const AuditEventModel = require('../models/audit-event.model');
 
+/**
+* Obtains a list of users. A search query can be used to paginate results
+* (page and limit are {int} params).
+* @function list
+* @param {object} req - Express' request object.
+* @param {object} res - Express' response object.
+* @returns {object}   - It should returns an HTTP status 200 response {object} with an {Array} of
+*                       users or an empty {Array} if no result is found.
+*/
 exports.list = (req, res) => {
   const page = req.query.page || 1;
   const limit = req.query.limit || 10;
@@ -24,6 +33,15 @@ exports.list = (req, res) => {
     .catch(() => res.status(500).json({ error: 'An unexpected error occurred' }));
 };
 
+/**
+* Creates an user and includes an audit event on database.
+* @function create
+* @param {object} req - Express' request object.
+* @param {object} res - Express' response object.
+* @returns {object}   - It should returns an HTTP status 201 response {object} with resource's location
+*                       on header, but it can also returns 400 if body params are invalid/required or
+*                       422 if user already exists.
+*/
 exports.create = (req, res) => {
   const body = req.body;
   if (!body.username) {
@@ -66,6 +84,15 @@ exports.create = (req, res) => {
     });
 };
 
+/**
+* Updates an user and includes an audit event on database.
+* @function update
+* @param {object} req - Express' request object.
+* @param {object} res - Express' response object.
+* @returns {object}   - It should returns an HTTP status 204 response {object}, but it can also returns
+*                       400 if body params are invalid, 404 if user does not exist or
+*                       422 if user is duplicated.
+*/
 exports.update = (req, res) => {
   const id = req.params.id;
   if (!ObjectId.isValid(id)) {
@@ -117,6 +144,14 @@ exports.update = (req, res) => {
     });
 };
 
+/**
+* Removes an user and includes an audit event on database.
+* @function delete
+* @param {object} req - Express' request object.
+* @param {object} res - Express' response object.
+* @returns {object}   - It should returns an HTTP status 204 response {object}, but it can also returns
+*                       404 if suser does not exist.
+*/
 exports.delete = (req, res) => {
   const id = req.params.id;
   if (!ObjectId.isValid(id)) {

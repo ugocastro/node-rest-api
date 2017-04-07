@@ -6,6 +6,16 @@ const RoleModel = require('../models/role.model');
 const UserModel = require('../models/user.model');
 const standardRoleAuthorizedRoutes = ['/super-heroes', '/super-powers', '/help-me'];
 
+/**
+* Authenticates and authorizes an user given a token is sent on request's header.
+* @function
+* @param {object} req - Express' request object.
+* @param {object} res - Express' response object.
+* @param {object} next - Middleware function to be called.
+* @returns {object}   - It should call the next middleware, but it can also returns
+*                       401 if token is (invalid / there is no token) or 403 user does not have
+*                       permission to access a route.
+*/
 module.exports = (req, res, next) => {
   const token = req.headers['x-access-token'];
   if (token) {

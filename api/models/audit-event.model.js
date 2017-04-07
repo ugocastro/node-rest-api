@@ -26,4 +26,8 @@ const auditEventSchema = new Schema ({
   }
 });
 
+/**
+* Audit event schema.
+* @module
+*/
 module.exports = mongoose.model('auditEvent', auditEventSchema);

@@ -6,11 +6,12 @@ const config = require('../../config');
 const UserModel = require('../models/user.model');
 
 /**
-* Get username and password to check authentication.
-* @function
+* Obtains username and password to check authentication.
+* @function authenticate
 * @param {object} req - Express' request object.
 * @param {object} res - Express' response object.
-* @returns {object} A HTTP status 200 response with a token.
+* @returns {object}   - It should returns an HTTP status 200 response {object} with a {String} token,
+*                       but it can also returns 404 if user not found or 401 for invalid credentials.
 */
 exports.authenticate = (req, res) => {
   UserModel.findOne({ username: req.body.username })

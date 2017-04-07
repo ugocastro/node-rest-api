@@ -14,4 +14,8 @@ const superPowerSchema = new Schema ({
   }
 });
 
+/**
+* Super power schema.
+* @module
+*/
 module.exports = mongoose.model('superPower', superPowerSchema);

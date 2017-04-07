@@ -6,6 +6,14 @@ const SuperPowerModel = require('../models/super-power.model');
 const SuperHeroModel = require('../models/super-hero.model');
 const AuditEventModel = require('../models/audit-event.model');
 
+/**
+* Obtains a single super power by it's identifier.
+* @function findOne
+* @param {object} req - Express' request object.
+* @param {object} res - Express' response object.
+* @returns {object}   - It should returns an HTTP status 200 response {object} with a super power
+*                       {object}, but it can also returns 404 if super power is not found.
+*/
 exports.findOne = (req, res) => {
   const id = req.params.id;
   if (!ObjectId.isValid(id)) {
@@ -22,6 +30,15 @@ exports.findOne = (req, res) => {
     .catch(() => res.status(500).json({ error: 'An unexpected error occurred' }));
 };
 
+/**
+* Obtains a list of super powers. A search query can be used to paginate results
+* (page and limit are {int} params).
+* @function list
+* @param {object} req - Express' request object.
+* @param {object} res - Express' response object.
+* @returns {object}   - It should returns an HTTP status 200 response {object} with an {Array} of
+*                       super powers or an empty {Array} if no result is found.
+*/
 exports.list = (req, res) => {
   const page = req.query.page || 1;
   const limit = req.query.limit || 10;
@@ -35,6 +52,15 @@ exports.list = (req, res) => {
     .catch(() => res.status(500).json({ error: 'An unexpected error occurred' }));
 };
 
+/**
+* Creates a super power and includes an audit event on database.
+* @function create
+* @param {object} req - Express' request object.
+* @param {object} res - Express' response object.
+* @returns {object}   - It should returns an HTTP status 201 response {object} with resource's location
+*                       on header, but it can also returns 400 if body params are invalid/required or
+*                       422 if super power already exists.
+*/
 exports.create = (req, res) => {
   const body = req.body;
   if (!body.name) {
@@ -60,6 +86,15 @@ exports.create = (req, res) => {
     });
 };
 
+/**
+* Updates a super power and includes an audit event on database.
+* @function update
+* @param {object} req - Express' request object.
+* @param {object} res - Express' response object.
+* @returns {object}   - It should returns an HTTP status 204 response {object}, but it can also returns
+*                       400 if body params are invalid, 404 if super power does not exist or
+*                       422 if super power is duplicated.
+*/
 exports.update = (req, res) => {
   const id = req.params.id;
   if (!ObjectId.isValid(id)) {
@@ -93,6 +128,15 @@ exports.update = (req, res) => {
     });
 };
 
+/**
+* Removes a super power and includes an audit event on database.
+* @function delete
+* @param {object} req - Express' request object.
+* @param {object} res - Express' response object.
+* @returns {object}   - It should returns an HTTP status 204 response {object}, but it can also returns
+*                       404 if super power does not exist or 422 if super power is associated with a
+*                       super hero.
+*/
 exports.delete = (req, res) => {
   const id = req.params.id;
   if (!ObjectId.isValid(id)) {

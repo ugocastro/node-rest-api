@@ -2,6 +2,10 @@
 
 const superHeroController = require('../controllers/super-hero.controller');
 
+/**
+* Configures super heroes' routes.
+* @module
+*/
 module.exports = app => {
   app.route('/super-heroes')
     .get(superHeroController.list)

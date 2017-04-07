@@ -9,6 +9,10 @@ const contentType = process.env.CONTENT_TYPE || 'application/json';
 const saltRounds = process.env.SALT_ROUNDS || 10;
 const secret = process.env.secret || '7Super.4Heroes-2Catalog!';
 
+/**
+* Exports all configuration used on API.
+* @module
+*/
 module.exports = {
   protocol,
   host,

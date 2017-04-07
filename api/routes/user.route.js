@@ -2,6 +2,10 @@
 
 const userController = require('../controllers/user.controller');
 
+/**
+* Configures user's routes.
+* @module
+*/
 module.exports = app => {
   app.route('/users')
     .get(userController.list)

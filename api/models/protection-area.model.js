@@ -23,4 +23,8 @@ const protectionAreaSchema = new Schema ({
   }
 });
 
+/**
+* Protection area schema.
+* @module
+*/
 module.exports = mongoose.model('protectionArea', protectionAreaSchema);

@@ -23,4 +23,8 @@ const userSchema = new Schema ({
 
 userSchema.plugin(idValidator);
 
+/**
+* User schema.
+* @module
+*/
 module.exports = mongoose.model('user', userSchema);

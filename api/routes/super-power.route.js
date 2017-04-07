@@ -2,6 +2,10 @@
 
 const superPowerController = require('../controllers/super-power.controller');
 
+/**
+* Configures super powers' routes.
+* @module
+*/
 module.exports = app => {
   app.route('/super-powers')
     .get(superPowerController.list)

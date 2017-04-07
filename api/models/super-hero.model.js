@@ -30,4 +30,8 @@ const superHeroSchema = new Schema ({
 superHeroSchema.set('collection', 'superheroes');
 superHeroSchema.plugin(idValidator);
 
+/**
+* Super hero schema.
+* @module
+*/
 module.exports = mongoose.model('superHero', superHeroSchema);

@@ -5,6 +5,14 @@ const config = require('../../config');
 const SuperHeroModel = require('../models/super-hero.model');
 const AuditEventModel = require('../models/audit-event.model');
 
+/**
+* Obtains a single super hero by it's identifier.
+* @function findOne
+* @param {object} req - Express' request object.
+* @param {object} res - Express' response object.
+* @returns {object}   - It should returns an HTTP status 200 response {object} with a super hero
+*                       {object}, but it can also returns 404 if super hero is not found.
+*/
 exports.findOne = (req, res) => {
   const id = req.params.id;
   if (!ObjectId.isValid(id)) {
@@ -23,6 +31,15 @@ exports.findOne = (req, res) => {
     .catch(() => res.status(500).json({ error: 'An unexpected error occurred' }));
 };
 
+/**
+* Obtains a list of super heroes. A search query can be used to paginate results
+* (page and limit are {int} params).
+* @function list
+* @param {object} req - Express' request object.
+* @param {object} res - Express' response object.
+* @returns {object}   - It should returns an HTTP status 200 response {object} with an {Array} of
+*                       super heroes or an empty {Array} if no result is found.
+*/
 exports.list = (req, res) => {
   const page = req.query.page || 1;
   const limit = req.query.limit || 10;
@@ -37,6 +54,15 @@ exports.list = (req, res) => {
     .catch(() => res.status(500).json({ error: 'An unexpected error occurred' }));
 };
 
+/**
+* Creates a super hero and includes an audit event on database.
+* @function create
+* @param {object} req - Express' request object.
+* @param {object} res - Express' response object.
+* @returns {object}   - It should returns an HTTP status 201 response {object} with resource's location
+*                       on header, but it can also returns 400 if body params are invalid/required or
+*                       422 if super hero already exists.
+*/
 exports.create = (req, res) => {
   const body = req.body;
   if (!body.name) {
@@ -80,6 +106,15 @@ exports.create = (req, res) => {
     });
 };
 
+/**
+* Updates a super hero and includes an audit event on database.
+* @function update
+* @param {object} req - Express' request object.
+* @param {object} res - Express' response object.
+* @returns {object}   - It should returns an HTTP status 204 response {object}, but it can also returns
+*                       400 if body params are invalid, 404 if super hero does not exist or
+*                       422 if super hero is duplicated.
+*/
 exports.update = (req, res) => {
   const id = req.params.id;
   if (!ObjectId.isValid(id)) {
@@ -125,6 +160,14 @@ exports.update = (req, res) => {
     });
 };
 
+/**
+* Removes a super hero and includes an audit event on database.
+* @function delete
+* @param {object} req - Express' request object.
+* @param {object} res - Express' response object.
+* @returns {object}   - It should returns an HTTP status 204 response {object}, but it can also returns
+*                       404 if super hero does not exist.
+*/
 exports.delete = (req, res) => {
   const id = req.params.id;
   if (!ObjectId.isValid(id)) {
